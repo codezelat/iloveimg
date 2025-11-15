@@ -10,9 +10,12 @@
             <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-20">
                     <Link :href="route('home')" class="flex items-center space-x-3">
-                        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary-500 to-orange-400 flex items-center justify-center shadow-lg shadow-primary-900/30">
-                            <span class="text-xl font-black">I</span>
-                        </div>
+                        <img
+                            src="/ilvimg.png"
+                            alt="ILoveIMG Studio logo"
+                            class="w-11 h-11 rounded-2xl shadow-lg shadow-primary-900/30 object-cover"
+                            loading="lazy"
+                        />
                         <div>
                             <p class="text-lg font-bold tracking-wide">ILoveIMG Studio</p>
                             <p class="text-xs text-white/60">Private · Instant · Pixel-perfect</p>

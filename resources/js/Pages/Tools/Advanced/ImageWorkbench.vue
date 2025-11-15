@@ -1,5 +1,10 @@
 <template>
     <AppLayout>
+        <SeoHead
+            title="Image Workbench"
+            description="Chain conversion, compression, resize, filters, and metadata cleanup entirely in your browser with the ILoveIMG Workbench (HEIC-ready)."
+            :keywords="['image workbench', 'batch image editor', 'heic support', 'browser pipeline']"
+        />
         <div class="px-4 py-8 max-w-6xl mx-auto space-y-8 text-white">
             <header class="text-center space-y-3">
                 <p class="text-sm uppercase tracking-[0.2em] text-primary-600 font-semibold">{{ toolName }}</p>
@@ -337,6 +342,7 @@
 import { computed, reactive, ref, onBeforeUnmount } from 'vue';
 import AppLayout from '../../Components/Layout/AppLayout.vue';
 import FileUploader from '../../Components/UI/FileUploader.vue';
+import SeoHead from '../../../Components/SeoHead.vue';
 import { useImageProcessor } from '../../../Composables/useImageProcessor';
 
 const props = defineProps({

@@ -1,5 +1,10 @@
 <template>
     <AppLayout>
+        <SeoHead
+            title="All-in-one browser image toolkit"
+            description="Process HEIC, JPG, PNG, GIF, WEBP, BMP, and TIFF files entirely in your browser with ILoveIMG Studio's 26+ tools."
+            :keywords="['image toolkit', 'heic to jpg', 'compress images', 'browser image editor']"
+        />
         <div class="space-y-16">
             <section class="relative overflow-hidden rounded-[40px] border border-white/10 bg-gradient-to-br from-white/5 via-transparent to-white/10 p-12">
                 <div class="absolute inset-0 pointer-events-none">
@@ -143,6 +148,7 @@
 import { computed, ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import AppLayout from './Components/Layout/AppLayout.vue';
+import SeoHead from '../Components/SeoHead.vue';
 
 const props = defineProps({
     tools: {

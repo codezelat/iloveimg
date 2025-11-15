@@ -302,6 +302,7 @@ public function rotateImage()
             ['label' => 'GIF', 'value' => 'gif'],
             ['label' => 'BMP', 'value' => 'bmp'],
             ['label' => 'TIFF', 'value' => 'tiff'],
+            ['label' => 'HEIC', 'value' => 'heic'],
         ];
     }
 

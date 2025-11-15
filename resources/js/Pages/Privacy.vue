@@ -1,5 +1,10 @@
 <template>
     <AppLayout>
+        <SeoHead
+            title="Privacy Policy"
+            description="Learn how ILoveIMG Studio keeps every image, preset, and workflow private with 100% client-side processing."
+            :keywords="['privacy policy', 'client-side processing', 'image security']"
+        />
         <div class="space-y-12 max-w-4xl mx-auto">
             <header class="space-y-4 text-center">
                 <p class="text-sm uppercase tracking-[0.4em] text-white/60">Policy</p>
@@ -49,4 +54,5 @@
 
 <script setup>
 import AppLayout from './Components/Layout/AppLayout.vue';
+import SeoHead from '../Components/SeoHead.vue';
 </script>

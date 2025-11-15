@@ -1,5 +1,10 @@
 <template>
     <AppLayout>
+        <SeoHead
+            :title="toolName"
+            :description="description"
+            :keywords="seoKeywords"
+        />
         <div class="space-y-10">
             <section class="relative overflow-hidden rounded-[36px] border border-white/10 bg-gradient-to-br from-white/5 via-white/0 to-white/5 p-10">
                 <div class="absolute inset-0 pointer-events-none">
@@ -159,6 +164,7 @@
 import { ref, computed } from 'vue';
 import AppLayout from '../Layout/AppLayout.vue';
 import FileUploader from './FileUploader.vue';
+import SeoHead from '../../../Components/SeoHead.vue';
 import { useImageProcessor } from '../../../Composables/useImageProcessor';
 
 const props = defineProps({
@@ -181,6 +187,14 @@ const props = defineProps({
         required: true
     }
 });
+
+const seoKeywords = computed(() => [
+    props.toolName,
+    props.fileTypeLabel,
+    props.actionButtonText,
+    'image processing',
+    'browser-based tools'
+]);
 
 const {
     isProcessing,
