@@ -15,7 +15,7 @@
                             All-in-one image studio for instant, private workflows.
                         </h1>
                         <p class="text-lg text-white/70 max-w-2xl">
-                            24+ pro-grade tools for conversion, compression, resizing, and editing — all powered by the Canvas API directly in your browser.
+                            26+ pro-grade tools for conversion, compression, resizing, and editing — all powered by the Canvas API directly in your browser (now including HEIC and HEIF support).
                         </p>
                         <div class="flex flex-wrap gap-4">
                             <Link :href="route('tools.image-workbench')" class="btn-primary">
@@ -31,7 +31,7 @@
                                 <p>Uploads to server</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-semibold text-white">24</p>
+                                <p class="text-2xl font-semibold text-white">26</p>
                                 <p>Specialized utilities</p>
                             </div>
                             <div>
@@ -175,7 +175,7 @@ const filteredCountCopy = computed(() => {
 });
 
 const heroHighlights = [
-    { label: 'Formats covered', value: '10+' },
+    { label: 'Formats covered', value: '12+ (incl. HEIC)' },
     { label: 'Compression presets', value: '4 levels' },
     { label: 'Resize strategies', value: '3 modes' },
     { label: 'Utility extras', value: 'Base64, watermark, more' },
@@ -184,7 +184,7 @@ const heroHighlights = [
 const featureCards = [
     { icon: '🔒', title: 'Instant privacy', description: 'Images never leave your device. Canvas-only processing keeps everything local.' },
     { icon: '⚡', title: 'Speed obsessed', description: 'GPU-accelerated canvas rendering, efficient batching, and zero network hops.' },
-    { icon: '🎨', title: 'Consistent UI', description: 'Every tool shares the same workspace for maximum muscle memory.' },
+    { icon: '📱', title: 'HEIC ready', description: 'Import HEIC/HEIF shots from iPhone or iPad and convert them offline in one tap.' },
     { icon: '🧰', title: 'Full toolkit', description: 'Conversion, compression, resize, edit, and utilities in one place.' },
 ];
 </script>

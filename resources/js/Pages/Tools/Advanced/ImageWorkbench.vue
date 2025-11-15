@@ -428,8 +428,11 @@ const getMetadataForFile = (file) => fileMetadata.value.get(getFileKey(file));
 
 const formatOptions = computed(() => (props.supportedFormats?.length ? props.supportedFormats : runtimeFormats));
 const acceptAttribute = computed(() => {
-    if (!formatOptions.value.length) return 'image/*';
-    return formatOptions.value.map((format) => `image/${format.value}`).join(',');
+    const baseFormats = formatOptions.value.length
+        ? formatOptions.value.map((format) => `image/${format.value}`)
+        : ['image/*'];
+    const extras = ['image/heic', 'image/heif', '.heic', '.heif'];
+    return [...new Set([...baseFormats, ...extras])].join(',');
 });
 const selectedCount = computed(() => selectedFiles.value.length);
 const totalSize = computed(() => selectedFiles.value.reduce((acc, file) => acc + (file.size || 0), 0));

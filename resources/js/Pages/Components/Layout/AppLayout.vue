@@ -57,9 +57,7 @@
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/70">
                     <p>© 2025 ILoveIMG Studio. Crafted for modern browsers. Images stay on your device.</p>
                     <div class="flex items-center gap-4">
-                        <a href="mailto:hello@iloveimg.studio" class="hover:text-white">Contact</a>
-                        <a href="#" class="hover:text-white">Privacy</a>
-                        <a href="#" class="hover:text-white">Status</a>
+                        <Link :href="route('privacy')" class="hover:text-white">Privacy Policy</Link>
                     </div>
                 </div>
             </div>

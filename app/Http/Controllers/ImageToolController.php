@@ -104,6 +104,22 @@ class ImageToolController extends Controller
         ]);
     }
 
+    public function heicToJpg()
+    {
+        return Inertia::render('Tools/Conversion/HeicToJpg', [
+            'toolName' => 'HEIC to JPG',
+            'description' => 'Convert HEIC and HEIF images to JPG format locally',
+        ]);
+    }
+
+    public function heicToPng()
+    {
+        return Inertia::render('Tools/Conversion/HeicToPng', [
+            'toolName' => 'HEIC to PNG',
+            'description' => 'Convert HEIC and HEIF images to PNG format locally',
+        ]);
+    }
+
     // Compression routes
     public function compressJpg()
     {
@@ -197,6 +213,11 @@ public function rotateImage()
         ]);
     }
 
+    public function privacy()
+    {
+        return Inertia::render('Privacy');
+    }
+
     // Home page
     public function index()
     {
@@ -224,6 +245,8 @@ public function rotateImage()
                     ['name' => 'BMP to PNG', 'path' => 'bmp-to-png'],
                     ['name' => 'TIFF to JPG', 'path' => 'tiff-to-jpg'],
                     ['name' => 'TIFF to PNG', 'path' => 'tiff-to-png'],
+                    ['name' => 'HEIC to JPG', 'path' => 'heic-to-jpg'],
+                    ['name' => 'HEIC to PNG', 'path' => 'heic-to-png'],
                 ]
             ],
             [

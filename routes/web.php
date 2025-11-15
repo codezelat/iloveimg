@@ -19,6 +19,8 @@ Route::get('/bmp-to-jpg', [ImageToolController::class, 'bmpToJpg'])->name('tools
 Route::get('/bmp-to-png', [ImageToolController::class, 'bmpToPng'])->name('tools.bmp-to-png');
 Route::get('/tiff-to-jpg', [ImageToolController::class, 'tiffToJpg'])->name('tools.tiff-to-jpg');
 Route::get('/tiff-to-png', [ImageToolController::class, 'tiffToPng'])->name('tools.tiff-to-png');
+Route::get('/heic-to-jpg', [ImageToolController::class, 'heicToJpg'])->name('tools.heic-to-jpg');
+Route::get('/heic-to-png', [ImageToolController::class, 'heicToPng'])->name('tools.heic-to-png');
 
 // Compression Routes
 Route::get('/compress-jpg', [ImageToolController::class, 'compressJpg'])->name('tools.compress-jpg');
@@ -40,3 +42,6 @@ Route::get('/base64-to-image', [ImageToolController::class, 'base64ToImage'])->n
 
 // Advanced Suite
 Route::get('/image-workbench', [ImageToolController::class, 'imageWorkbench'])->name('tools.image-workbench');
+
+// Privacy Page
+Route::get('/privacy', [ImageToolController::class, 'privacy'])->name('privacy');

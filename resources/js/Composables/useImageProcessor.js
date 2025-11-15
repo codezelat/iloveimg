@@ -1,4 +1,5 @@
 import { ref } from "vue";
+import heic2any from "heic2any";
 
 export function useImageProcessor() {
     const isProcessing = ref(false);
@@ -14,6 +15,9 @@ export function useImageProcessor() {
         { label: "TIFF", value: "tiff" },
     ];
 
+    const heicMimeTypes = ["image/heic", "image/heif"];
+    const heicExtensionRegex = /\.(heic|heif)$/i;
+
     const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
     const formatFileSizeLabel = (bytes = 0) => {
@@ -25,12 +29,49 @@ export function useImageProcessor() {
         return `${value} ${sizes[i]}`;
     };
 
-    const readFileAsDataUrl = (file) => {
+    const convertHeicToProcessable = async (file) => {
+        const isHeic =
+            heicMimeTypes.includes(file.type?.toLowerCase()) ||
+            heicExtensionRegex.test(file.name || "");
+
+        if (!isHeic) {
+            return file;
+        }
+
+        try {
+            const convertedBlob = await heic2any({
+                blob: file,
+                toType: "image/png",
+                quality: 1,
+            });
+            return new File([
+                convertedBlob instanceof Blob ? convertedBlob : new Blob([convertedBlob]),
+            ], file.name.replace(heicExtensionRegex, ".png"), {
+                type: "image/png",
+                lastModified: Date.now(),
+            });
+        } catch (error) {
+            console.error("HEIC/HEIF conversion failed", error);
+            throw new Error(
+                "This browser cannot decode HEIC/HEIF files automatically. Try updating your browser or converting on another device."
+            );
+        }
+    };
+
+    const prepareFileForCanvas = async (file) => {
+        if (!(file instanceof File)) {
+            return file;
+        }
+        return await convertHeicToProcessable(file);
+    };
+
+    const readFileAsDataUrl = async (file) => {
+        const safeFile = await prepareFileForCanvas(file);
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (e) => resolve(e.target.result);
             reader.onerror = reject;
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(safeFile);
         });
     };
 
@@ -171,6 +212,8 @@ export function useImageProcessor() {
     };
 
     const convertImage = async (file, targetFormat, quality = 0.92) => {
+        const safeFile = await prepareFileForCanvas(file);
+
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
 
@@ -205,7 +248,7 @@ export function useImageProcessor() {
             };
 
             reader.onerror = reject;
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(safeFile);
         });
     };
 
@@ -215,6 +258,8 @@ export function useImageProcessor() {
     };
 
     const resizeImage = async (file, width, height, maintainAspect = true) => {
+        const safeFile = await prepareFileForCanvas(file);
+
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
 
@@ -238,15 +283,14 @@ export function useImageProcessor() {
                     const ctx = canvas.getContext("2d");
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-                    const format = file.type.split("/")[1];
                     canvas.toBlob(
                         (blob) => {
                             const resizedFile = new File([blob], file.name, {
-                                type: file.type,
+                                type: safeFile.type,
                             });
                             resolve(resizedFile);
                         },
-                        file.type,
+                        safeFile.type,
                         0.92
                     );
                 };
@@ -255,11 +299,13 @@ export function useImageProcessor() {
             };
 
             reader.onerror = reject;
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(safeFile);
         });
     };
 
     const rotateImage = async (file, degrees) => {
+        const safeFile = await prepareFileForCanvas(file);
+
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
 
@@ -285,11 +331,11 @@ export function useImageProcessor() {
                     canvas.toBlob(
                         (blob) => {
                             const rotatedFile = new File([blob], file.name, {
-                                type: file.type,
+                                type: safeFile.type,
                             });
                             resolve(rotatedFile);
                         },
-                        file.type,
+                        safeFile.type,
                         0.92
                     );
                 };
@@ -298,16 +344,17 @@ export function useImageProcessor() {
             };
 
             reader.onerror = reject;
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(safeFile);
         });
     };
 
-    const imageToBase64 = (file) => {
+    const imageToBase64 = async (file) => {
+        const safeFile = await prepareFileForCanvas(file);
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (e) => resolve(e.target.result);
             reader.onerror = reject;
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(safeFile);
         });
     };
 
@@ -335,6 +382,7 @@ export function useImageProcessor() {
     };
 
     const cropImage = async (file, cropArea) => {
+        const safeFile = await prepareFileForCanvas(file);
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
 
@@ -361,11 +409,11 @@ export function useImageProcessor() {
                     canvas.toBlob(
                         (blob) => {
                             const croppedFile = new File([blob], file.name, {
-                                type: file.type,
+                                type: safeFile.type,
                             });
                             resolve(croppedFile);
                         },
-                        file.type,
+                        safeFile.type,
                         0.92
                     );
                 };
@@ -374,11 +422,12 @@ export function useImageProcessor() {
             };
 
             reader.onerror = reject;
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(safeFile);
         });
     };
 
     const addWatermarkToImage = async (file, watermarkConfig) => {
+        const safeFile = await prepareFileForCanvas(file);
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
 
@@ -482,11 +531,11 @@ export function useImageProcessor() {
                                     const watermarkedFile = new File(
                                         [blob],
                                         file.name,
-                                        { type: file.type }
+                                        { type: safeFile.type }
                                     );
                                     resolve(watermarkedFile);
                                 },
-                                file.type,
+                                safeFile.type,
                                 0.92
                             );
                         };
@@ -500,11 +549,11 @@ export function useImageProcessor() {
                                 const watermarkedFile = new File(
                                     [blob],
                                     file.name,
-                                    { type: file.type }
+                                    { type: safeFile.type }
                                 );
                                 resolve(watermarkedFile);
                             },
-                            file.type,
+                            safeFile.type,
                             0.92
                         );
                     }
@@ -514,7 +563,7 @@ export function useImageProcessor() {
             };
 
             reader.onerror = reject;
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(safeFile);
         });
     };
 
