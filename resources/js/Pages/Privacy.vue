@@ -46,7 +46,7 @@
 
             <section class="rounded-3xl border border-white/10 bg-white/5 p-6 space-y-3">
                 <h2 class="text-2xl font-semibold text-white">Questions?</h2>
-                <p class="text-white/70">Have a compliance or security request? Email <a class="text-primary-200" href="mailto:hello@iloveimg.studio">hello@iloveimg.studio</a> and we’ll respond within two business days.</p>
+                <p class="text-white/70">Have a compliance or security request? Email <a class="text-primary-200" href="mailto:info@codezela">info@codezela.com</a> and we’ll respond within two business days.</p>
             </section>
         </div>
     </AppLayout>
