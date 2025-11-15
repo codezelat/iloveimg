@@ -22,7 +22,7 @@ A complete Laravel + Vue 3 application for browser-based image processing. All o
 
 ### Edit Tools
 - Rotate images (90°, 180°, 270°)
-- Add watermarks (coming soon)
+- Add watermarks
 
 ### Utilities
 - Image to Base64 converter
