@@ -27,7 +27,7 @@
         <footer class="bg-white border-t mt-12">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <p class="text-center text-gray-500 text-sm">
-                    © 2024 ILoveIMG. All image processing happens locally in your browser.
+                    © 2025 ILoveIMG. All image processing happens locally in your browser.
                 </p>
             </div>
         </footer>

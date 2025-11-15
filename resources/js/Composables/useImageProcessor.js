@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref } from "vue";
 
 export function useImageProcessor() {
     const isProcessing = ref(false);
@@ -8,72 +8,87 @@ export function useImageProcessor() {
     const convertImage = async (file, targetFormat, quality = 0.92) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            
+
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
+                    const canvas = document.createElement("canvas");
                     canvas.width = img.width;
                     canvas.height = img.height;
-                    
-                    const ctx = canvas.getContext('2d');
+
+                    const ctx = canvas.getContext("2d");
                     ctx.drawImage(img, 0, 0);
-                    
-                    canvas.toBlob((blob) => {
-                        const convertedFile = new File([blob], 
-                            file.name.replace(/\.[^/.]+$/, `.${targetFormat}`),
-                            { type: `image/${targetFormat}` }
-                        );
-                        resolve(convertedFile);
-                    }, `image/${targetFormat}`, quality);
+
+                    canvas.toBlob(
+                        (blob) => {
+                            const convertedFile = new File(
+                                [blob],
+                                file.name.replace(
+                                    /\.[^/.]+$/,
+                                    `.${targetFormat}`
+                                ),
+                                { type: `image/${targetFormat}` }
+                            );
+                            resolve(convertedFile);
+                        },
+                        `image/${targetFormat}`,
+                        quality
+                    );
                 };
                 img.onerror = reject;
                 img.src = e.target.result;
             };
-            
+
             reader.onerror = reject;
             reader.readAsDataURL(file);
         });
     };
 
     const compressImage = async (file, quality = 0.7) => {
-        const format = file.type.split('/')[1];
+        const format = file.type.split("/")[1];
         return await convertImage(file, format, quality);
     };
 
     const resizeImage = async (file, width, height, maintainAspect = true) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            
+
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    
+                    const canvas = document.createElement("canvas");
+
                     if (maintainAspect) {
-                        const ratio = Math.min(width / img.width, height / img.height);
+                        const ratio = Math.min(
+                            width / img.width,
+                            height / img.height
+                        );
                         canvas.width = img.width * ratio;
                         canvas.height = img.height * ratio;
                     } else {
                         canvas.width = width;
                         canvas.height = height;
                     }
-                    
-                    const ctx = canvas.getContext('2d');
+
+                    const ctx = canvas.getContext("2d");
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    const format = file.type.split('/')[1];
-                    canvas.toBlob((blob) => {
-                        const resizedFile = new File([blob], file.name,
-                            { type: file.type }
-                        );
-                        resolve(resizedFile);
-                    }, file.type, 0.92);
+
+                    const format = file.type.split("/")[1];
+                    canvas.toBlob(
+                        (blob) => {
+                            const resizedFile = new File([blob], file.name, {
+                                type: file.type,
+                            });
+                            resolve(resizedFile);
+                        },
+                        file.type,
+                        0.92
+                    );
                 };
                 img.onerror = reject;
                 img.src = e.target.result;
             };
-            
+
             reader.onerror = reject;
             reader.readAsDataURL(file);
         });
@@ -82,13 +97,13 @@ export function useImageProcessor() {
     const rotateImage = async (file, degrees) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            
+
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const rad = degrees * Math.PI / 180;
-                    
+                    const canvas = document.createElement("canvas");
+                    const rad = (degrees * Math.PI) / 180;
+
                     if (degrees === 90 || degrees === 270) {
                         canvas.width = img.height;
                         canvas.height = img.width;
@@ -96,23 +111,27 @@ export function useImageProcessor() {
                         canvas.width = img.width;
                         canvas.height = img.height;
                     }
-                    
-                    const ctx = canvas.getContext('2d');
+
+                    const ctx = canvas.getContext("2d");
                     ctx.translate(canvas.width / 2, canvas.height / 2);
                     ctx.rotate(rad);
                     ctx.drawImage(img, -img.width / 2, -img.height / 2);
-                    
-                    canvas.toBlob((blob) => {
-                        const rotatedFile = new File([blob], file.name,
-                            { type: file.type }
-                        );
-                        resolve(rotatedFile);
-                    }, file.type, 0.92);
+
+                    canvas.toBlob(
+                        (blob) => {
+                            const rotatedFile = new File([blob], file.name, {
+                                type: file.type,
+                            });
+                            resolve(rotatedFile);
+                        },
+                        file.type,
+                        0.92
+                    );
                 };
                 img.onerror = reject;
                 img.src = e.target.result;
             };
-            
+
             reader.onerror = reject;
             reader.readAsDataURL(file);
         });
@@ -127,8 +146,8 @@ export function useImageProcessor() {
         });
     };
 
-    const base64ToImage = (base64, filename = 'image.png') => {
-        const arr = base64.split(',');
+    const base64ToImage = (base64, filename = "image.png") => {
+        const arr = base64.split(",");
         const mime = arr[0].match(/:(.*?);/)[1];
         const bstr = atob(arr[1]);
         let n = bstr.length;
@@ -141,13 +160,197 @@ export function useImageProcessor() {
 
     const downloadFile = (file) => {
         const url = URL.createObjectURL(file);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = file.name;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+    };
+
+    const cropImage = async (file, cropArea) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = cropArea.width;
+                    canvas.height = cropArea.height;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(
+                        img,
+                        cropArea.x,
+                        cropArea.y,
+                        cropArea.width,
+                        cropArea.height,
+                        0,
+                        0,
+                        cropArea.width,
+                        cropArea.height
+                    );
+
+                    canvas.toBlob(
+                        (blob) => {
+                            const croppedFile = new File([blob], file.name, {
+                                type: file.type,
+                            });
+                            resolve(croppedFile);
+                        },
+                        file.type,
+                        0.92
+                    );
+                };
+                img.onerror = reject;
+                img.src = e.target.result;
+            };
+
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    };
+
+    const addWatermarkToImage = async (file, watermarkConfig) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+
+                    // Set transparency
+                    ctx.globalAlpha = watermarkConfig.opacity;
+
+                    if (watermarkConfig.type === "text") {
+                        // Add text watermark
+                        ctx.font = `${watermarkConfig.fontSize}px ${watermarkConfig.fontFamily}`;
+                        ctx.fillStyle = watermarkConfig.color;
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+
+                        // Calculate position
+                        const positions = {
+                            "top-left": { x: 50, y: 50 },
+                            "top-center": { x: canvas.width / 2, y: 50 },
+                            "top-right": { x: canvas.width - 50, y: 50 },
+                            center: {
+                                x: canvas.width / 2,
+                                y: canvas.height / 2,
+                            },
+                            "bottom-left": { x: 50, y: canvas.height - 50 },
+                            "bottom-center": {
+                                x: canvas.width / 2,
+                                y: canvas.height - 50,
+                            },
+                            "bottom-right": {
+                                x: canvas.width - 50,
+                                y: canvas.height - 50,
+                            },
+                        };
+
+                        const pos =
+                            positions[watermarkConfig.position] ||
+                            positions["bottom-right"];
+                        ctx.fillText(watermarkConfig.text, pos.x, pos.y);
+                    } else if (
+                        watermarkConfig.type === "image" &&
+                        watermarkConfig.watermarkImage
+                    ) {
+                        // Add image watermark
+                        const wmImg = new Image();
+                        wmImg.onload = () => {
+                            const wmWidth = watermarkConfig.size || 100;
+                            const wmHeight =
+                                (wmImg.height / wmImg.width) * wmWidth;
+
+                            // Calculate position
+                            const positions = {
+                                "top-left": { x: 20, y: 20 },
+                                "top-center": {
+                                    x: (canvas.width - wmWidth) / 2,
+                                    y: 20,
+                                },
+                                "top-right": {
+                                    x: canvas.width - wmWidth - 20,
+                                    y: 20,
+                                },
+                                center: {
+                                    x: (canvas.width - wmWidth) / 2,
+                                    y: (canvas.height - wmHeight) / 2,
+                                },
+                                "bottom-left": {
+                                    x: 20,
+                                    y: canvas.height - wmHeight - 20,
+                                },
+                                "bottom-center": {
+                                    x: (canvas.width - wmWidth) / 2,
+                                    y: canvas.height - wmHeight - 20,
+                                },
+                                "bottom-right": {
+                                    x: canvas.width - wmWidth - 20,
+                                    y: canvas.height - wmHeight - 20,
+                                },
+                            };
+
+                            const pos =
+                                positions[watermarkConfig.position] ||
+                                positions["bottom-right"];
+                            ctx.drawImage(
+                                wmImg,
+                                pos.x,
+                                pos.y,
+                                wmWidth,
+                                wmHeight
+                            );
+
+                            canvas.toBlob(
+                                (blob) => {
+                                    const watermarkedFile = new File(
+                                        [blob],
+                                        file.name,
+                                        { type: file.type }
+                                    );
+                                    resolve(watermarkedFile);
+                                },
+                                file.type,
+                                0.92
+                            );
+                        };
+                        wmImg.onerror = reject;
+                        wmImg.src = watermarkConfig.watermarkImage;
+                    }
+
+                    if (watermarkConfig.type === "text") {
+                        canvas.toBlob(
+                            (blob) => {
+                                const watermarkedFile = new File(
+                                    [blob],
+                                    file.name,
+                                    { type: file.type }
+                                );
+                                resolve(watermarkedFile);
+                            },
+                            file.type,
+                            0.92
+                        );
+                    }
+                };
+                img.onerror = reject;
+                img.src = e.target.result;
+            };
+
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
     };
 
     const downloadFiles = (files) => {
@@ -166,9 +369,11 @@ export function useImageProcessor() {
         compressImage,
         resizeImage,
         rotateImage,
+        cropImage,
+        addWatermarkToImage,
         imageToBase64,
         base64ToImage,
         downloadFile,
-        downloadFiles
+        downloadFiles,
     };
 }
