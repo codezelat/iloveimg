@@ -1,10 +1,10 @@
 <template>
     <AppLayout>
-        <div class="px-4 py-8 max-w-6xl mx-auto space-y-8">
+        <div class="px-4 py-8 max-w-6xl mx-auto space-y-8 text-white">
             <header class="text-center space-y-3">
                 <p class="text-sm uppercase tracking-[0.2em] text-primary-600 font-semibold">{{ toolName }}</p>
-                <h1 class="text-4xl font-bold text-gray-900">All-in-One Image Workbench</h1>
-                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                <h1 class="text-4xl font-bold text-white">All-in-One Image Workbench</h1>
+                <p class="text-lg text-white/70 max-w-3xl mx-auto">
                     {{ description }} Configure conversion, compression, resize, filters, orientation, and metadata cleanup in a single offline workflow.
                 </p>
                 <div class="flex flex-wrap justify-center gap-3 text-sm">
@@ -16,15 +16,15 @@
 
             <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
                 <section class="space-y-6">
-                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur">
                         <div class="flex items-center justify-between mb-4">
                             <div>
-                                <h2 class="text-xl font-semibold text-gray-900">Upload & Queue</h2>
-                                <p class="text-sm text-gray-500">Drop unlimited files – nothing leaves your browser.</p>
+                                <h2 class="text-xl font-semibold text-white">Upload & Queue</h2>
+                                <p class="text-sm text-white/50">Drop unlimited files – nothing leaves your browser.</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-2xl font-bold text-gray-900">{{ selectedCount }}</p>
-                                <p class="text-xs uppercase tracking-wide text-gray-500">files queued</p>
+                                <p class="text-2xl font-bold text-white">{{ selectedCount }}</p>
+                                <p class="text-xs uppercase tracking-wide text-white/50">files queued</p>
                             </div>
                         </div>
                         <FileUploader
@@ -38,11 +38,11 @@
                         <div v-if="selectedFiles.length" class="mt-6">
                             <div class="flex items-center justify-between mb-3">
                                 <div>
-                                    <p class="text-sm text-gray-600">{{ queueStats.sizeLabel }} total · {{ queueStats.mpCount }} MP combined</p>
+                                    <p class="text-sm text-white/70">{{ queueStats.sizeLabel }} total · {{ queueStats.mpCount }} MP combined</p>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <button
-                                        class="px-3 py-1.5 rounded-lg bg-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-200"
+                                        class="px-3 py-1.5 rounded-2xl bg-white/10 text-sm font-medium text-white hover:bg-white/20"
                                         @click="resetSelection"
                                     >
                                         Clear Queue
@@ -54,20 +54,20 @@
                                 <article
                                     v-for="(file, index) in selectedFiles"
                                     :key="`${file.name}-${file.lastModified}-${index}`"
-                                    class="border border-gray-200 rounded-xl p-4 flex flex-col gap-3 bg-gray-50"
+                                    class="border border-white/10 rounded-2xl p-4 flex flex-col gap-3 bg-white/5"
                                 >
                                     <div class="flex items-start justify-between gap-4">
                                         <div class="space-y-1">
-                                            <p class="font-semibold text-gray-900 truncate">{{ file.name }}</p>
-                                            <p class="text-sm text-gray-600">{{ formatFileSizeLabel(file.size) }} · {{ file.type || 'unknown type' }}</p>
-                                            <p v-if="getMetadataForFile(file)" class="text-xs text-gray-500">
+                                            <p class="font-semibold text-white truncate">{{ file.name }}</p>
+                                            <p class="text-sm text-white/70">{{ formatFileSizeLabel(file.size) }} · {{ file.type || 'unknown type' }}</p>
+                                            <p v-if="getMetadataForFile(file)" class="text-xs text-white/50">
                                                 {{ getMetadataForFile(file).width }}×{{ getMetadataForFile(file).height }} px ·
                                                 {{ getMetadataForFile(file).megapixels }} MP ·
                                                 {{ getMetadataForFile(file).orientation }}
                                             </p>
                                         </div>
                                         <button
-                                            class="text-sm text-red-600 hover:text-red-700"
+                                            class="text-sm text-red-300 hover:text-red-200"
                                             @click="removeFile(index)"
                                         >
                                             Remove
@@ -75,13 +75,13 @@
                                     </div>
                                     <div class="flex flex-wrap gap-2">
                                         <button
-                                            class="px-3 py-1.5 rounded-lg border border-gray-300 text-sm text-gray-700 hover:bg-gray-100"
+                                            class="px-3 py-1.5 rounded-2xl border border-white/20 text-sm text-white/80 hover:bg-white/10"
                                             @click="previewFile(file, false)"
                                         >
                                             View Original
                                         </button>
                                         <button
-                                            class="px-3 py-1.5 rounded-lg border border-primary-200 text-sm text-primary-700 hover:bg-primary-50"
+                                            class="px-3 py-1.5 rounded-2xl border border-primary-200/40 text-sm text-primary-200 hover:bg-primary-500/10"
                                             @click="previewFile(file, true)"
                                         >
                                             Pipeline Preview
@@ -92,17 +92,17 @@
                         </div>
                     </div>
 
-                    <div v-if="processingLogs.length" class="bg-white rounded-2xl shadow-lg p-6">
+                    <div v-if="processingLogs.length" class="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur">
                         <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-lg font-semibold text-gray-900">Activity</h2>
-                            <button class="text-sm text-gray-500 hover:text-gray-700" @click="clearLogs">Clear</button>
+                            <h2 class="text-lg font-semibold text-white">Activity</h2>
+                            <button class="text-sm text-white/50 hover:text-white/80" @click="clearLogs">Clear</button>
                         </div>
                         <ul class="space-y-2 max-h-48 overflow-y-auto">
                             <li
                                 v-for="log in processingLogs"
                                 :key="log.id"
                                 class="text-sm"
-                                :class="log.type === 'error' ? 'text-red-600' : 'text-gray-700'"
+                                :class="log.type === 'error' ? 'text-red-400' : 'text-white/80'"
                             >
                                 {{ log.message }}
                             </li>
@@ -110,20 +110,20 @@
                     </div>
                 </section>
 
-                <aside class="bg-white rounded-2xl shadow-lg p-6 space-y-6">
+                <aside class="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-6 backdrop-blur">
                     <div class="space-y-3">
-                        <h3 class="text-lg font-semibold text-gray-900">Format & Quality</h3>
-                        <label class="block text-sm font-medium text-gray-700">Target format</label>
+                        <h3 class="text-lg font-semibold text-white">Format & Quality</h3>
+                        <label class="block text-sm font-medium text-white/80">Target format</label>
                         <select
                             v-model="pipeline.format"
-                            class="w-full border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                            class="w-full rounded-2xl border border-white/20 bg-transparent text-white focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                         >
                             <option v-for="format in formatOptions" :key="format.value" :value="format.value">
                                 {{ format.label }}
                             </option>
                         </select>
                         <div>
-                            <div class="flex items-center justify-between text-sm text-gray-600">
+                            <div class="flex items-center justify-between text-sm text-white/70">
                                 <span>Quality</span>
                                 <span>{{ pipeline.quality }}%</span>
                             </div>
@@ -139,11 +139,11 @@
                     </div>
 
                     <div class="space-y-3">
-                        <h3 class="text-lg font-semibold text-gray-900">Resize</h3>
-                        <label class="block text-sm text-gray-600">Mode</label>
+                        <h3 class="text-lg font-semibold text-white">Resize</h3>
+                        <label class="block text-sm text-white/70">Mode</label>
                         <select
                             v-model="pipeline.resizeMode"
-                            class="w-full border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                            class="w-full rounded-2xl border border-white/20 bg-transparent text-white focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                         >
                             <option value="original">Keep original</option>
                             <option value="contain">Contain within</option>
@@ -152,53 +152,53 @@
                         </select>
                         <div v-if="pipeline.resizeMode === 'contain' || pipeline.resizeMode === 'exact'" class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs text-gray-500">Width (px)</label>
+                                <label class="block text-xs text-white/50">Width (px)</label>
                                 <input
                                     v-model.number="pipeline.width"
                                     type="number"
                                     min="1"
-                                    class="w-full border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                                    class="w-full rounded-2xl border border-white/20 bg-transparent text-white focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                                 />
                             </div>
                             <div>
-                                <label class="block text-xs text-gray-500">Height (px)</label>
+                                <label class="block text-xs text-white/50">Height (px)</label>
                                 <input
                                     v-model.number="pipeline.height"
                                     type="number"
                                     min="1"
-                                    class="w-full border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                                    class="w-full rounded-2xl border border-white/20 bg-transparent text-white focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                                 />
                             </div>
                         </div>
                         <div v-if="pipeline.resizeMode === 'percentage'">
-                            <label class="block text-xs text-gray-500">Scale (%)</label>
+                            <label class="block text-xs text-white/50">Scale (%)</label>
                             <input
                                 v-model.number="pipeline.percentage"
                                 type="number"
                                 min="10"
                                 max="500"
-                                class="w-full border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                                class="w-full rounded-2xl border border-white/20 bg-transparent text-white focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                             />
                         </div>
-                        <label class="inline-flex items-center text-sm text-gray-600">
+                        <label class="inline-flex items-center text-sm text-white/70">
                             <input type="checkbox" v-model="pipeline.maintainAspect" class="mr-2" />
                             Maintain aspect ratio
                         </label>
                     </div>
 
                     <div class="space-y-3">
-                        <h3 class="text-lg font-semibold text-gray-900">Orientation</h3>
-                        <label class="block text-sm text-gray-600">Rotate</label>
+                        <h3 class="text-lg font-semibold text-white">Orientation</h3>
+                        <label class="block text-sm text-white/70">Rotate</label>
                         <select
                             v-model.number="pipeline.rotate"
-                            class="w-full border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                            class="w-full rounded-2xl border border-white/20 bg-transparent text-white focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                         >
                             <option :value="0">0°</option>
                             <option :value="90">90°</option>
                             <option :value="180">180°</option>
                             <option :value="270">270°</option>
                         </select>
-                        <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <div class="flex items-center gap-4 text-sm text-white/70">
                             <label class="inline-flex items-center">
                                 <input type="checkbox" v-model="pipeline.flipHorizontal" class="mr-2" />
                                 Flip horizontal
@@ -212,11 +212,11 @@
 
                     <div class="space-y-3">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-semibold text-gray-900">Filters</h3>
+                            <h3 class="text-lg font-semibold text-white">Filters</h3>
                             <button class="text-xs text-primary-600" @click="resetFilters">Reset</button>
                         </div>
                         <div v-for="filterControl in filterControls" :key="filterControl.key">
-                            <div class="flex items-center justify-between text-xs text-gray-500">
+                            <div class="flex items-center justify-between text-xs text-white/50">
                                 <span>{{ filterControl.label }}</span>
                                 <span>{{ pipeline.filters[filterControl.key] }}{{ filterControl.suffix }}</span>
                             </div>
@@ -232,21 +232,21 @@
                     </div>
 
                     <div class="space-y-3">
-                        <h3 class="text-lg font-semibold text-gray-900">Background</h3>
+                        <h3 class="text-lg font-semibold text-white">Background</h3>
                         <div class="flex items-center gap-3">
                             <input
                                 v-model="pipeline.backgroundColor"
                                 type="color"
-                                class="w-12 h-12 rounded-lg border border-gray-200"
+                                class="w-12 h-12 rounded-2xl border border-white/20 bg-white/10"
                             />
-                            <p class="text-sm text-gray-600">Used when exporting to formats without transparency support.</p>
+                            <p class="text-sm text-white/70">Used when exporting to formats without transparency support.</p>
                         </div>
                     </div>
 
                     <div class="space-y-3">
                         <div class="flex flex-wrap gap-3">
                             <button
-                                class="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                class="flex-1 px-4 py-2 rounded-2xl border border-white/20 text-sm font-medium text-white/80 hover:bg-white/10"
                                 @click="resetPipeline"
                             >
                                 Reset Settings
@@ -267,24 +267,24 @@
                             <span v-else>Process {{ selectedFiles.length || '' }} Files</span>
                         </button>
                         <div v-if="isProcessing" class="space-y-2">
-                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                <div class="bg-primary-600 h-2.5 rounded-full transition-all duration-300" :style="{ width: progress + '%' }"></div>
+                            <div class="w-full bg-white/10 rounded-full h-2.5">
+                                <div class="bg-gradient-to-r from-primary-500 to-orange-400 h-2.5 rounded-full transition-all duration-300" :style="{ width: progress + '%' }"></div>
                             </div>
-                            <p class="text-xs text-gray-500 text-center">Large images stay on device – just give the browser a moment.</p>
+                            <p class="text-xs text-white/50 text-center">Large images stay on device – just give the browser a moment.</p>
                         </div>
                     </div>
                 </aside>
             </div>
 
-            <section v-if="processedResults.length" class="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+            <section v-if="processedResults.length" class="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-4 backdrop-blur">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h2 class="text-2xl font-semibold text-gray-900">Processed Files</h2>
-                        <p class="text-sm text-gray-600">Ready to download with the configured pipeline.</p>
+                        <h2 class="text-2xl font-semibold text-white">Processed Files</h2>
+                        <p class="text-sm text-white/70">Ready to download with the configured pipeline.</p>
                     </div>
                     <div class="flex flex-wrap gap-3">
                         <button class="btn-primary" @click="downloadAll">Download All</button>
-                        <button class="px-4 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 hover:bg-gray-50" @click="resetSelection">
+                        <button class="btn-secondary" @click="resetSelection">
                             Start Over
                         </button>
                     </div>
@@ -293,22 +293,22 @@
                     <article
                         v-for="item in processedResults"
                         :key="item.id"
-                        class="border border-gray-200 rounded-xl p-4 flex items-center justify-between gap-4"
+                        class="border border-white/15 rounded-2xl p-4 flex items-center justify-between gap-4 bg-white/5"
                     >
                         <div class="flex items-center gap-4">
-                            <div class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                            <div class="w-20 h-20 bg-white/10 rounded-xl flex items-center justify-center overflow-hidden">
                                 <img v-if="item.previewUrl" :src="item.previewUrl" alt="Preview" class="object-contain max-w-full max-h-full" loading="lazy" />
                                 <span v-else class="text-2xl">🖼️</span>
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-900">{{ item.file.name }}</p>
-                                <p class="text-sm text-gray-600">{{ item.metadata.width }}×{{ item.metadata.height }} px · {{ formatFileSizeLabel(item.file.size) }}</p>
-                                <p class="text-xs text-gray-500">{{ item.metadata.megapixels }} MP · {{ item.metadata.orientation }}</p>
+                                <p class="font-semibold text-white">{{ item.file.name }}</p>
+                                <p class="text-sm text-white/70">{{ item.metadata.width }}×{{ item.metadata.height }} px · {{ formatFileSizeLabel(item.file.size) }}</p>
+                                <p class="text-xs text-white/50">{{ item.metadata.megapixels }} MP · {{ item.metadata.orientation }}</p>
                             </div>
                         </div>
                         <div class="flex flex-col gap-2">
                             <button class="btn-primary text-sm" @click="downloadResult(item)">Download</button>
-                            <button class="text-sm text-primary-600" @click="previewProcessed(item)">Preview</button>
+                            <button class="text-sm text-primary-200" @click="previewProcessed(item)">Preview</button>
                         </div>
                     </article>
                 </div>
@@ -316,15 +316,15 @@
 
             <transition name="fade">
                 <div v-if="previewState.open" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center px-4">
-                    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full p-6 relative">
-                        <button class="absolute top-4 right-4 text-gray-500 hover:text-gray-800" @click="closePreview">✕</button>
-                        <p class="text-sm text-gray-500 mb-2">Previewing {{ previewState.title }}</p>
+                    <div class="bg-slate-900/90 border border-white/15 rounded-3xl shadow-2xl max-w-4xl w-full p-6 relative backdrop-blur">
+                        <button class="absolute top-4 right-4 text-white/60 hover:text-white" @click="closePreview">✕</button>
+                        <p class="text-sm text-white/60 mb-2">Previewing {{ previewState.title }}</p>
                         <div class="min-h-[300px] flex items-center justify-center">
-                            <div v-if="previewState.loading" class="text-gray-500 text-sm">Generating preview…</div>
+                            <div v-if="previewState.loading" class="text-white/60 text-sm">Generating preview…</div>
                             <img v-else :src="previewState.src" alt="Preview image" class="max-h-[70vh] w-full object-contain rounded-xl" />
                         </div>
                         <div class="text-right mt-4">
-                            <button class="px-4 py-2 rounded-lg border border-gray-300 text-sm text-gray-700" @click="closePreview">Close</button>
+                            <button class="btn-secondary" @click="closePreview">Close</button>
                         </div>
                     </div>
                 </div>

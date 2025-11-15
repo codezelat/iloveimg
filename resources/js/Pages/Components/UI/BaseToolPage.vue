@@ -1,87 +1,162 @@
 <template>
     <AppLayout>
-        <div class="px-4">
-            <!-- Tool Header -->
-            <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ toolName }}</h1>
-                <p class="text-lg text-gray-600">{{ description }}</p>
-            </div>
-
-            <!-- Upload Section -->
-            <div v-if="!processedFiles.length" class="max-w-4xl mx-auto">
-                <FileUploader 
-                    :accept="acceptedFormats"
-                    :file-type="fileTypeLabel"
-                    @files-selected="handleFilesSelected"
-                />
-                
-                <div v-if="selectedFiles.length > 0" class="mt-6 text-center">
-                    <button 
-                        @click="processFiles"
-                        :disabled="isProcessing"
-                        class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <span v-if="isProcessing">Processing...</span>
-                        <span v-else>{{ actionButtonText }}</span>
-                    </button>
+        <div class="space-y-10">
+            <section class="relative overflow-hidden rounded-[36px] border border-white/10 bg-gradient-to-br from-white/5 via-white/0 to-white/5 p-10">
+                <div class="absolute inset-0 pointer-events-none">
+                    <div class="absolute -top-8 right-0 w-64 h-64 bg-primary-500/30 blur-[140px] rounded-full"></div>
                 </div>
-
-                <div v-if="isProcessing" class="mt-4">
-                    <div class="w-full bg-gray-200 rounded-full h-2.5">
-                        <div class="bg-primary-600 h-2.5 rounded-full transition-all duration-300" :style="{ width: progress + '%' }"></div>
-                    </div>
-                    <p class="text-center text-sm text-gray-600 mt-2">{{ progress }}% Complete</p>
-                </div>
-            </div>
-
-            <!-- Results Section -->
-            <div v-else class="max-w-4xl mx-auto">
-                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-2xl font-bold text-gray-800">Processed Files</h2>
-                        <button @click="reset" class="text-primary-600 hover:text-primary-700">
-                            Process More Files
-                        </button>
-                    </div>
-                    
-                    <div class="space-y-3">
-                        <div 
-                            v-for="(file, index) in processedFiles" 
-                            :key="index"
-                            class="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                        >
-                            <div class="flex items-center space-x-3">
-                                <span class="text-2xl">✅</span>
-                                <div>
-                                    <p class="font-medium text-gray-900">{{ file.name }}</p>
-                                    <p class="text-sm text-gray-500">{{ formatFileSize(file.size) }}</p>
-                                </div>
-                            </div>
-                            <button 
-                                @click="downloadFile(file)"
-                                class="btn-primary text-sm"
-                            >
-                                Download
-                            </button>
+                <div class="relative z-10 grid gap-8 lg:grid-cols-[2fr_1fr]">
+                    <div class="space-y-4">
+                        <p class="text-sm uppercase tracking-[0.4em] text-white/60">Processing Suite</p>
+                        <h1 class="text-4xl font-semibold leading-tight">{{ toolName }}</h1>
+                        <p class="text-lg text-white/70 max-w-2xl">{{ description }}</p>
+                        <div class="flex flex-wrap gap-3 text-xs uppercase tracking-widest text-white/70">
+                            <span class="px-4 py-1.5 rounded-full bg-white/10 border border-white/20">{{ fileTypeLabel }}</span>
+                            <span class="px-4 py-1.5 rounded-full bg-white/10 border border-white/20">{{ actionButtonText }}</span>
+                            <span class="px-4 py-1.5 rounded-full bg-white/10 border border-white/20">Batch ready</span>
                         </div>
                     </div>
-
-                    <div class="mt-6 text-center">
-                        <button 
-                            @click="downloadAllFiles"
-                            class="btn-primary"
-                        >
-                            Download All Files
-                        </button>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <p class="text-xs text-white/50 mb-1">Queued</p>
+                            <p class="text-2xl font-semibold">{{ selectedFiles.length }}</p>
+                            <p class="text-sm text-white/60">Files</p>
+                        </div>
+                        <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <p class="text-xs text-white/50 mb-1">Processed</p>
+                            <p class="text-2xl font-semibold">{{ processedFiles.length }}</p>
+                            <p class="text-sm text-white/60">Downloads ready</p>
+                        </div>
+                        <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <p class="text-xs text-white/50 mb-1">Progress</p>
+                            <p class="text-2xl font-semibold">{{ progress }}%</p>
+                            <p class="text-sm text-white/60">Live status</p>
+                        </div>
+                        <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <p class="text-xs text-white/50 mb-1">Privacy</p>
+                            <p class="text-2xl font-semibold">Local</p>
+                            <p class="text-sm text-white/60">Never uploaded</p>
+                        </div>
                     </div>
                 </div>
+            </section>
+
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+                <section class="rounded-[32px] border border-white/10 bg-white/5 p-8 space-y-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.4em] text-white/50">Step 1</p>
+                            <h2 class="text-2xl font-semibold text-white">Upload workspace</h2>
+                        </div>
+                        <span class="px-4 py-1 rounded-full text-xs uppercase tracking-widest bg-white/10 text-white/70">Drop · Paste · Browse</span>
+                    </div>
+                    <FileUploader
+                        v-model="selectedFiles"
+                        :accept="acceptedFormats"
+                        :file-type="fileTypeLabel"
+                        :show-selection-preview="false"
+                        @files-selected="handleFilesSelected"
+                    />
+
+                    <div v-if="selectedFiles.length" class="space-y-4">
+                        <div class="flex items-center justify-between text-sm text-white/60">
+                            <p>{{ selectedFiles.length }} file{{ selectedFiles.length === 1 ? '' : 's' }} queued · {{ totalSelectedSize }}</p>
+                            <button class="text-primary-200 hover:text-primary-100" @click="reset">
+                                Reset
+                            </button>
+                        </div>
+                        <div class="space-y-3 max-h-[280px] overflow-y-auto pr-2">
+                            <div
+                                v-for="(file, index) in selectedFiles"
+                                :key="`${file.name}-${index}`"
+                                class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 p-4"
+                            >
+                                <div class="flex items-center gap-4 min-w-0">
+                                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500/60 to-orange-400/60 flex items-center justify-center text-sm font-semibold">
+                                        {{ getFileExtension(file) }}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-white font-medium truncate">{{ file.name }}</p>
+                                        <p class="text-xs text-white/60">{{ formatFileSize(file.size) }}</p>
+                                    </div>
+                                </div>
+                                <button class="text-white/50 hover:text-white" @click="removeFile(index)">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <aside class="rounded-[32px] border border-white/10 bg-white/5 p-8 space-y-6">
+                    <div class="space-y-2">
+                        <p class="text-sm uppercase tracking-[0.4em] text-white/50">Step 2</p>
+                        <h3 class="text-xl font-semibold text-white">Run pipeline</h3>
+                        <p class="text-sm text-white/60">Optimized Canvas processing with native quality control.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-white/70">Overall progress</span>
+                            <span class="text-white font-semibold">{{ progress }}%</span>
+                        </div>
+                        <div class="h-2 rounded-full bg-white/10 overflow-hidden">
+                            <div class="h-full rounded-full bg-gradient-to-r from-primary-500 to-orange-400 transition-all duration-300" :style="{ width: progress + '%' }"></div>
+                        </div>
+                        <p class="text-xs text-white/50">{{ statusLabel }}</p>
+                    </div>
+
+                    <button
+                        class="btn-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="!selectedFiles.length || isProcessing"
+                        @click="processFiles"
+                    >
+                        <span v-if="isProcessing">Hold tight…</span>
+                        <span v-else>{{ actionButtonText }}</span>
+                    </button>
+
+                    <div class="space-y-2 text-sm text-white/60">
+                        <p class="font-semibold text-white/80">Smart defaults</p>
+                        <ul class="space-y-1 text-xs">
+                            <li>• Automatic aspect ratio protection</li>
+                            <li>• Color-safe conversion for JPEG & WEBP targets</li>
+                            <li>• Local batch downloads with progress pacing</li>
+                        </ul>
+                    </div>
+                </aside>
             </div>
+
+            <section v-if="processedFiles.length" class="rounded-[32px] border border-white/10 bg-white/5 p-8 space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <p class="text-sm uppercase tracking-[0.4em] text-white/50">Step 3</p>
+                        <h2 class="text-2xl font-semibold text-white">Processed Assets</h2>
+                        <p class="text-sm text-white/60">Ready to download instantly from your browser memory.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="btn-primary" @click="downloadAllFiles">Download All</button>
+                        <button class="btn-secondary" @click="reset">Start New Batch</button>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div
+                        v-for="(file, index) in processedFiles"
+                        :key="`processed-${index}`"
+                        class="rounded-2xl border border-white/10 bg-white/5 p-4 flex items-center justify-between gap-4"
+                    >
+                        <div class="space-y-1">
+                            <p class="text-white font-medium">{{ file.name }}</p>
+                            <p class="text-xs text-white/60">{{ formatFileSize(file.size) }}</p>
+                        </div>
+                        <button class="btn-secondary text-sm" @click="downloadFile(file)">Download</button>
+                    </div>
+                </div>
+            </section>
         </div>
     </AppLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import AppLayout from '../Layout/AppLayout.vue';
 import FileUploader from './FileUploader.vue';
 import { useImageProcessor } from '../../../Composables/useImageProcessor';
@@ -117,8 +192,37 @@ const {
 const selectedFiles = ref([]);
 const processedFiles = ref([]);
 
+const totalSelectedSize = computed(() => {
+    if (!selectedFiles.value.length) return '0 Bytes';
+    const total = selectedFiles.value.reduce((sum, file) => sum + (file.size || 0), 0);
+    return formatFileSize(total);
+});
+
+const statusLabel = computed(() => {
+    if (isProcessing.value) {
+        return `Processing ${progress.value}% · Stay on this tab`;
+    }
+    if (!selectedFiles.value.length) {
+        return 'Add files to activate the pipeline';
+    }
+    if (processedFiles.value.length) {
+        return 'Batch ready · Download anytime';
+    }
+    return 'Ready when you are';
+});
+
 const handleFilesSelected = (files) => {
     selectedFiles.value = files;
+};
+
+const removeFile = (index) => {
+    const updated = [...selectedFiles.value];
+    updated.splice(index, 1);
+    selectedFiles.value = updated;
+    if (!updated.length) {
+        processedFiles.value = [];
+        progress.value = 0;
+    }
 };
 
 const processFiles = async () => {
@@ -161,5 +265,10 @@ const formatFileSize = (bytes) => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+};
+
+const getFileExtension = (file) => {
+    const parts = file.name?.split('.') ?? [];
+    return (parts.pop() || 'IMG').substring(0, 4).toUpperCase();
 };
 </script>
