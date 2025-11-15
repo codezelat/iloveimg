@@ -37,3 +37,6 @@ Route::get('/watermark-image', [ImageToolController::class, 'watermarkImage'])->
 // Utility Routes
 Route::get('/image-to-base64', [ImageToolController::class, 'imageToBase64'])->name('tools.image-to-base64');
 Route::get('/base64-to-image', [ImageToolController::class, 'base64ToImage'])->name('tools.base64-to-image');
+
+// Advanced Suite
+Route::get('/image-workbench', [ImageToolController::class, 'imageWorkbench'])->name('tools.image-workbench');

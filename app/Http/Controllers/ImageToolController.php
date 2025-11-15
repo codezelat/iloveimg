@@ -154,14 +154,14 @@ class ImageToolController extends Controller
         ]);
     }
 
-    // Other tools
-    public function rotateImage()
-    {
-        return Inertia::render('Tools/Edit/RotateImage', [
-            'toolName' => 'Rotate Image',
-            'description' => 'Rotate images in your browser'
-        ]);
-    }
+// Other tools
+public function rotateImage()
+{
+    return Inertia::render('Tools/Edit/RotateImage', [
+        'toolName' => 'Rotate Image',
+        'description' => 'Rotate images in your browser'
+    ]);
+}
 
     public function watermarkImage()
     {
@@ -184,6 +184,16 @@ class ImageToolController extends Controller
         return Inertia::render('Tools/Utility/Base64ToImage', [
             'toolName' => 'Base64 to Image',
             'description' => 'Convert Base64 to image in your browser'
+        ]);
+    }
+
+    public function imageWorkbench()
+    {
+        return Inertia::render('Tools/Advanced/ImageWorkbench', [
+            'toolName' => 'Image Workbench',
+            'description' => 'Full pipeline editor for conversion, compression, resize, filters, and metadata cleanup',
+            'supportedFormats' => $this->getSupportedFormats(),
+            'defaultPipeline' => $this->getDefaultPipelineConfig(),
         ]);
     }
 
@@ -250,6 +260,51 @@ class ImageToolController extends Controller
                     ['name' => 'Base64 to Image', 'path' => 'base64-to-image'],
                 ]
             ],
+            [
+                'name' => 'Advanced Suite',
+                'icon' => '🧰',
+                'tools' => [
+                    ['name' => 'Image Workbench', 'path' => 'image-workbench'],
+                ]
+            ],
+        ];
+    }
+
+    private function getSupportedFormats()
+    {
+        return [
+            ['label' => 'JPEG', 'value' => 'jpeg'],
+            ['label' => 'PNG', 'value' => 'png'],
+            ['label' => 'WEBP', 'value' => 'webp'],
+            ['label' => 'GIF', 'value' => 'gif'],
+            ['label' => 'BMP', 'value' => 'bmp'],
+            ['label' => 'TIFF', 'value' => 'tiff'],
+        ];
+    }
+
+    private function getDefaultPipelineConfig()
+    {
+        return [
+            'format' => 'jpeg',
+            'quality' => 90,
+            'resizeMode' => 'original',
+            'width' => 1920,
+            'height' => 1080,
+            'percentage' => 100,
+            'maintainAspect' => true,
+            'rotate' => 0,
+            'flipHorizontal' => false,
+            'flipVertical' => false,
+            'filters' => [
+                'brightness' => 100,
+                'contrast' => 100,
+                'saturation' => 100,
+                'hue' => 0,
+                'blur' => 0,
+                'grayscale' => 0,
+                'sepia' => 0,
+            ],
+            'backgroundColor' => '#ffffff',
         ];
     }
 }

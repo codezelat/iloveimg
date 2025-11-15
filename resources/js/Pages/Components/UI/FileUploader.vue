@@ -39,7 +39,7 @@
         </div>
 
         <!-- Selected Files Preview -->
-        <div v-if="selectedFiles.length > 0" class="mt-6 space-y-3">
+<div v-if="showSelectionPreview && selectedFiles.length > 0" class="mt-6 space-y-3">
             <h3 class="text-lg font-semibold text-gray-800">Selected Files:</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div 
@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits, watch } from 'vue';
 
 const props = defineProps({
     accept: {
@@ -87,14 +87,28 @@ const props = defineProps({
     fileType: {
         type: String,
         default: 'images'
+    },
+    modelValue: Array,
+    showSelectionPreview: {
+        type: Boolean,
+        default: true
     }
 });
 
-const emit = defineEmits(['filesSelected']);
+const emit = defineEmits(['filesSelected', 'update:modelValue']);
 
 const fileInput = ref(null);
 const selectedFiles = ref([]);
 const isDragging = ref(false);
+
+watch(
+    () => props.modelValue,
+    (value) => {
+        if (value === undefined) return;
+        selectedFiles.value = Array.isArray(value) ? [...value] : [];
+    },
+    { immediate: true }
+);
 
 const handleFileSelect = (event) => {
     const files = Array.from(event.target.files);
@@ -107,14 +121,20 @@ const handleDrop = (event) => {
     addFiles(files);
 };
 
+const updateSelection = (files) => {
+    selectedFiles.value = files;
+    emit('update:modelValue', files);
+    emit('filesSelected', files);
+};
+
 const addFiles = (files) => {
-    selectedFiles.value = [...selectedFiles.value, ...files];
-    emit('filesSelected', selectedFiles.value);
+    updateSelection([...selectedFiles.value, ...files]);
 };
 
 const removeFile = (index) => {
-    selectedFiles.value.splice(index, 1);
-    emit('filesSelected', selectedFiles.value);
+    const updated = [...selectedFiles.value];
+    updated.splice(index, 1);
+    updateSelection(updated);
 };
 
 const formatFileSize = (bytes) => {
