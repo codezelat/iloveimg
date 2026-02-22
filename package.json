@@ -1,5 +1,10 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
+    "name": "iloveimg-studio",
+    "version": "1.0.0",
+    "description": "Private, browser-based image conversion, compression, and editing tools",
+    "author": "Codezela Technologies <info@codezela.com> (https://codezela.com)",
+    "license": "MIT",
     "private": true,
     "type": "module",
     "scripts": {

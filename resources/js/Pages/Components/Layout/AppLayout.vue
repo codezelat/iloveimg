@@ -99,8 +99,9 @@
                     class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/70"
                 >
                     <p>
-                        © 2025-2026 ILoveIMG Studio. Crafted for modern browsers.
-                        Images stay on your device.
+                        © 2025-2026 ILoveIMG Studio. Crafted with ❤️ by 
+                        <a href="https://codezela.com" target="_blank" rel="noopener noreferrer" class="text-primary-400 hover:text-primary-300">Codezela Technologies</a> 
+                        for modern browsers. Images stay on your device.
                     </p>
                     <div class="flex items-center gap-4">
                         <Link :href="route('privacy')" class="hover:text-white"

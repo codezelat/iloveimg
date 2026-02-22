@@ -1,10 +1,18 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "codezela/iloveimg-studio",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "ILoveIMG Studio - Private, browser-based image conversion, compression, and editing tools by Codezela Technologies",
+    "keywords": ["image-processing", "client-side", "heic", "webp", "conversion"],
+    "homepage": "https://codezela.com",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Codezela Technologies",
+            "email": "info@codezela.com",
+            "homepage": "https://codezela.com"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "inertiajs/inertia-laravel": "^2.0",

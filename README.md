@@ -1,6 +1,11 @@
-# ILoveIMG - Client-Side Image Processing Application
+# ILoveIMG Studio - Client-Side Image Processing Application
 
-A complete Laravel + Vue 3 application for browser-based image processing. All operations happen client-side using Canvas API - no server uploads required!
+[![Codezela Technologies](https://img.shields.io/badge/Crafted%20with%20%E2%9D%A4%EF%B8%8F%20by-Codezela%20Technologies-blue)](https://codezela.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+A complete Laravel + Vue 3 application for browser-based image processing. All operations happen client-side using Canvas API and WebAssembly - no server uploads required!
+
+**Crafted with ❤️ by [Codezela Technologies](https://codezela.com)**
 
 ## 🚀 Features
 
@@ -186,11 +191,29 @@ const compressQuality = 0.7;
 
 ## 📝 License
 
-This project is open-source and available under the MIT License.
+This project is open-source and available under the [MIT License](LICENSE).
+
+Copyright © 2025-2026 [Codezela Technologies](https://codezela.com)
+
+## 🏢 About Codezela Technologies
+
+**ILoveIMG Studio** is crafted with ❤️ by [Codezela Technologies](https://codezela.com)
+
+We build privacy-first, client-side web applications that put users in control of their data.
+
+- 🌐 Website: [https://codezela.com](https://codezela.com)
+- 📧 Email: [info@codezela.com](mailto:info@codezela.com)
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 🙏 Acknowledgments
+
+- [libheif-js](https://github.com/catdad-experiments/libheif-js) - HEIC/HEIF decoding
+- [Laravel](https://laravel.com) - PHP Framework
+- [Vue.js](https://vuejs.org) - Progressive JavaScript Framework
+- [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS Framework
 
 ## 🐛 Issues
 
