@@ -6,6 +6,7 @@
         file-type-label="SVG images"
         action-button-text="Convert to PNG"
         :processing-function="convertToPng"
+        output-format="png"
     />
 </template>
 

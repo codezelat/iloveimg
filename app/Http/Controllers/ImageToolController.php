@@ -229,6 +229,47 @@ public function rotateImage()
         ]);
     }
 
+    // AVIF conversion routes
+    public function jpgToAvif()
+    {
+        return Inertia::render('Tools/Conversion/JpgToAvif', [
+            'toolName' => 'JPG to AVIF',
+            'description' => 'Convert JPG images to AVIF format for superior compression in your browser'
+        ]);
+    }
+
+    public function pngToAvif()
+    {
+        return Inertia::render('Tools/Conversion/PngToAvif', [
+            'toolName' => 'PNG to AVIF',
+            'description' => 'Convert PNG images to AVIF format with transparency support in your browser'
+        ]);
+    }
+
+    public function webpToAvif()
+    {
+        return Inertia::render('Tools/Conversion/WebpToAvif', [
+            'toolName' => 'WEBP to AVIF',
+            'description' => 'Convert WEBP images to AVIF format for even better compression'
+        ]);
+    }
+
+    public function avifToJpg()
+    {
+        return Inertia::render('Tools/Conversion/AvifToJpg', [
+            'toolName' => 'AVIF to JPG',
+            'description' => 'Convert AVIF images to JPG format for broader compatibility'
+        ]);
+    }
+
+    public function avifToPng()
+    {
+        return Inertia::render('Tools/Conversion/AvifToPng', [
+            'toolName' => 'AVIF to PNG',
+            'description' => 'Convert AVIF images to PNG format with lossless quality'
+        ]);
+    }
+
     public function privacy()
     {
         return Inertia::render('PrivacyPolicy');
@@ -269,6 +310,11 @@ public function rotateImage()
                     ['name' => 'HEIC to JPG', 'path' => 'heic-to-jpg'],
                     ['name' => 'HEIC to PNG', 'path' => 'heic-to-png'],
                     ['name' => 'SVG to PNG', 'path' => 'svg-to-png'],
+                    ['name' => 'JPG to AVIF', 'path' => 'jpg-to-avif'],
+                    ['name' => 'PNG to AVIF', 'path' => 'png-to-avif'],
+                    ['name' => 'WEBP to AVIF', 'path' => 'webp-to-avif'],
+                    ['name' => 'AVIF to JPG', 'path' => 'avif-to-jpg'],
+                    ['name' => 'AVIF to PNG', 'path' => 'avif-to-png'],
                 ]
             ],
             [
@@ -326,6 +372,7 @@ public function rotateImage()
             ['label' => 'BMP', 'value' => 'bmp'],
             ['label' => 'TIFF', 'value' => 'tiff'],
             ['label' => 'HEIC', 'value' => 'heic'],
+            ['label' => 'AVIF', 'value' => 'avif'],
         ];
     }
 

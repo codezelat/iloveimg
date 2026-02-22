@@ -159,6 +159,22 @@
                         </button>
                     </div>
 
+                    <!-- Custom Options Slot -->
+                    <slot name="options"></slot>
+
+                    <!-- EXIF Toggle -->
+                    <ExifToggle
+                        v-if="validFiles.length && showExifOptions"
+                        v-model="preserveExif"
+                        :output-format="outputFormat"
+                    />
+
+                    <!-- EXIF Info for Selected Files -->
+                    <div v-if="validFiles.length && showExifOptions" class="space-y-3">
+                        <p class="text-xs uppercase tracking-[0.2em] text-white/40">Metadata</p>
+                        <ExifInfo :file="validFiles[0]" :show-empty="false" />
+                    </div>
+
                     <div class="space-y-2 text-sm text-white/60">
                         <p class="font-semibold text-white/80">Smart defaults</p>
                         <ul class="space-y-1 text-xs">
@@ -213,6 +229,8 @@ import { saveAs } from 'file-saver';
 import AppLayout from '../Layout/AppLayout.vue';
 import FileUploader from './FileUploader.vue';
 import SeoHead from '../../../Components/SeoHead.vue';
+import ExifInfo from '../../../Components/ExifInfo.vue';
+import ExifToggle from '../../../Components/ExifToggle.vue';
 import { useImageProcessor } from '../../../Composables/useImageProcessor';
 
 const props = defineProps({
@@ -237,6 +255,14 @@ const props = defineProps({
     isLoadingConverter: {
         type: Boolean,
         default: false
+    },
+    showExifOptions: {
+        type: Boolean,
+        default: true
+    },
+    outputFormat: {
+        type: String,
+        default: ''
     }
 });
 
@@ -261,6 +287,7 @@ const selectedFiles = ref([]);
 const processedFiles = ref([]);
 const errorMessage = ref('');
 const isCreatingZip = ref(false);
+const preserveExif = ref(true);
 
 const isFileOversized = (file) => file.size > MAX_FILE_SIZE;
 
@@ -370,7 +397,9 @@ const processFiles = async () => {
 
     for (let i = 0; i < totalFiles; i++) {
         try {
-            const processed = await props.processingFunction(validFiles.value[i]);
+            const processed = await props.processingFunction(validFiles.value[i], {
+                preserveExif: preserveExif.value
+            });
             processedFiles.value.push(processed);
             progress.value = Math.round(((i + 1) / totalFiles) * 100);
         } catch (error) {
@@ -442,6 +471,7 @@ const reset = () => {
     processedFiles.value = [];
     progress.value = 0;
     errorMessage.value = '';
+    preserveExif.value = true;
 };
 
 const formatFileSize = (bytes) => {

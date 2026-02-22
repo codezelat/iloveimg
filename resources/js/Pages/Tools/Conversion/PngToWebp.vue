@@ -6,6 +6,7 @@
         file-type-label="PNG images"
         action-button-text="Convert to WEBP"
         :processing-function="convertToWebp"
+        output-format="webp"
     />
 </template>
 
@@ -20,7 +21,7 @@ defineProps({
 
 const { convertImage } = useImageProcessor();
 
-const convertToWebp = async (file) => {
-    return await convertImage(file, 'webp', 0.9);
+const convertToWebp = async (file, options = {}) => {
+    return await convertImage(file, 'webp', 0.9, options);
 };
 </script>

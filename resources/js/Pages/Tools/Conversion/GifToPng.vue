@@ -6,6 +6,7 @@
         file-type-label="GIF images"
         action-button-text="Convert to PNG"
         :processing-function="convertToPng"
+        output-format="png"
     />
 </template>
 
@@ -20,7 +21,7 @@ defineProps({
 
 const { convertImage } = useImageProcessor();
 
-const convertToPng = async (file) => {
-    return await convertImage(file, "png", 1.0);
+const convertToPng = async (file, options = {}) => {
+    return await convertImage(file, "png", 1.0, options);
 };
 </script>

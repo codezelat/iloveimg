@@ -1,7 +1,7 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
     "name": "iloveimg-studio",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Private, browser-based image conversion, compression, and editing tools",
     "author": "Codezela Technologies <info@codezela.com> (https://codezela.com)",
     "license": "MIT",
@@ -22,6 +22,8 @@
     },
     "dependencies": {
         "@ffmpeg/core": "^0.12.10",
+        "@squoosh/lib": "^0.4.0",
+        "exif-js": "^2.3.0",
         "@ffmpeg/ffmpeg": "^0.12.15",
         "@ffmpeg/util": "^0.12.2",
         "@inertiajs/vue3": "^2.2.17",

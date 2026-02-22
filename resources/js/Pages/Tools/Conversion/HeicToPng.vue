@@ -7,6 +7,7 @@
         action-button-text="Convert to PNG"
         :processing-function="convertToPng"
         :is-loading-converter="isLoading"
+        output-format="png"
     />
 </template>
 

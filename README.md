@@ -14,6 +14,9 @@ A complete Laravel + Vue 3 application for browser-based image processing. All o
 - GIF → JPG/PNG
 - BMP → JPG/PNG
 - TIFF → JPG/PNG
+- HEIC/HEIF → JPG/PNG
+- AVIF ↔ JPG/PNG/WEBP
+- SVG → PNG
 
 ### Image Compression
 - Compress JPG, PNG, WEBP, and GIF images
@@ -32,6 +35,12 @@ A complete Laravel + Vue 3 application for browser-based image processing. All o
 ### Utilities
 - Image to Base64 converter
 - Base64 to Image converter
+- Favicon/ICO Generator
+
+### Advanced Features
+- Image Workbench (pipeline editor)
+- EXIF metadata handling (preserve/strip)
+- PWA support (installable, offline capable)
 
 ## 🛠️ Technology Stack
 
@@ -40,7 +49,9 @@ A complete Laravel + Vue 3 application for browser-based image processing. All o
 - **Routing**: Inertia.js 2.0
 - **Styling**: Tailwind CSS
 - **Build Tool**: Vite
-- **Image Processing**: HTML5 Canvas API
+- **Image Processing**: HTML5 Canvas API + WebAssembly (HEIC, AVIF)
+- **PWA**: Service Worker, Offline support
+- **EXIF**: Metadata preservation/stripping
 
 ## 📦 Installation
 
@@ -142,6 +153,14 @@ iloveimg/
 - `/bmp-to-png` - Convert BMP to PNG
 - `/tiff-to-jpg` - Convert TIFF to JPG
 - `/tiff-to-png` - Convert TIFF to PNG
+- `/heic-to-jpg` - Convert HEIC to JPG
+- `/heic-to-png` - Convert HEIC to PNG
+- `/svg-to-png` - Convert SVG to PNG
+- `/jpg-to-avif` - Convert JPG to AVIF
+- `/png-to-avif` - Convert PNG to AVIF
+- `/webp-to-avif` - Convert WEBP to AVIF
+- `/avif-to-jpg` - Convert AVIF to JPG
+- `/avif-to-png` - Convert AVIF to PNG
 
 ### Compression Tools
 - `/compress-jpg` - Compress JPG images
@@ -160,6 +179,10 @@ iloveimg/
 ### Utilities
 - `/image-to-base64` - Convert images to Base64
 - `/base64-to-image` - Convert Base64 to images
+- `/ico-generator` - Generate favicon.ico files
+
+### Advanced
+- `/image-workbench` - Pipeline editor for batch processing
 
 ## 🔐 Privacy & Security
 
@@ -189,6 +212,23 @@ const quality = 0.92;
 const compressQuality = 0.7;
 ```
 
+## 📊 Health & Monitoring
+
+- `/health` - Full health check endpoint
+- `/up` - Simple uptime check
+
+## 🔧 Environment Variables
+
+```bash
+# Sentry Error Tracking (optional)
+SENTRY_DSN=your-sentry-dsn
+SENTRY_ENVIRONMENT=production
+
+# Security Headers
+SECURITY_HEADERS_ENABLED=true
+CSP_ENABLED=false
+```
+
 ## 📝 License
 
 This project is open-source and available under the [MIT License](LICENSE).
@@ -211,6 +251,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 🙏 Acknowledgments
 
 - [libheif-js](https://github.com/catdad-experiments/libheif-js) - HEIC/HEIF decoding
+- [@squoosh/lib](https://github.com/GoogleChromeLabs/squoosh) - AVIF encoding
+- [exif-js](https://github.com/exif-js/exif-js) - EXIF metadata extraction
 - [Laravel](https://laravel.com) - PHP Framework
 - [Vue.js](https://vuejs.org) - Progressive JavaScript Framework
 - [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS Framework

@@ -1,4 +1,14 @@
 <template>
+    <Head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#0f172a" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="ILoveIMG" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="mask-icon" href="/icon.svg" color="#3b82f6" />
+    </Head>
+
     <div class="min-h-screen bg-slate-950 text-white">
         <div class="absolute inset-0 pointer-events-none">
             <div
@@ -56,6 +66,18 @@
                     </div>
 
                     <div class="flex items-center gap-3">
+                        <!-- Install App Button (small icon only) -->
+                        <button
+                            v-if="showInstallBtn"
+                            @click="triggerInstall"
+                            class="hidden sm:inline-flex items-center justify-center w-8 h-8 rounded-lg border border-white/10 text-white/50 hover:text-white hover:border-white/30 hover:bg-white/5 transition"
+                            title="Install app"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                        </button>
+                        
                         <span
                             class="hidden md:inline-flex items-center px-3 py-1 rounded-full text-xs uppercase tracking-widest bg-white/10 text-white/70"
                         >
@@ -92,6 +114,9 @@
             <slot />
         </main>
 
+        <!-- PWA Install Prompt -->
+        <PwaInstallPrompt />
+
         <!-- Footer -->
         <footer class="relative z-10 border-t border-white/10 mt-16">
             <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
@@ -119,5 +144,58 @@
 </template>
 
 <script setup>
-import { Link } from "@inertiajs/vue3";
+import { ref, onMounted } from 'vue';
+import { Link, Head } from "@inertiajs/vue3";
+import PwaInstallPrompt from '../../../Components/PwaInstallPrompt.vue';
+
+const showInstallBtn = ref(false);
+let installPrompt = null;
+
+const checkStandalone = () => {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true ||
+           window.location.search.includes('?standalone');
+};
+
+onMounted(() => {
+    // Check standalone status
+    if (checkStandalone()) {
+        showInstallBtn.value = false;
+        return;
+    }
+    
+    // Show install button (always visible for non-PWA, helps users find it)
+    showInstallBtn.value = true;
+    
+    // Listen for install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        installPrompt = e;
+        window.deferredInstallPrompt = e;
+    });
+    
+    // Check if already stored
+    if (window.deferredInstallPrompt) {
+        installPrompt = window.deferredInstallPrompt;
+    }
+    
+    // Also hide if app gets installed
+    window.addEventListener('appinstalled', () => {
+        showInstallBtn.value = false;
+    });
+});
+
+const triggerInstall = async () => {
+    const prompt = installPrompt || window.deferredInstallPrompt;
+    
+    if (prompt) {
+        prompt.prompt();
+        const { outcome } = await prompt.userChoice;
+        if (outcome === 'accepted') {
+            showInstallBtn.value = false;
+        }
+    } else {
+        alert('To install:\n\n1. Click the ⋯ menu in Edge\n2. Go to Apps → Install this site as an app');
+    }
+};
 </script>

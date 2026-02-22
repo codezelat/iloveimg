@@ -22,6 +22,13 @@ Route::get('/tiff-to-png', [ImageToolController::class, 'tiffToPng'])->name('too
 Route::get('/heic-to-jpg', [ImageToolController::class, 'heicToJpg'])->name('tools.heic-to-jpg');
 Route::get('/heic-to-png', [ImageToolController::class, 'heicToPng'])->name('tools.heic-to-png');
 
+// AVIF Conversion Routes
+Route::get('/jpg-to-avif', [ImageToolController::class, 'jpgToAvif'])->name('tools.jpg-to-avif');
+Route::get('/png-to-avif', [ImageToolController::class, 'pngToAvif'])->name('tools.png-to-avif');
+Route::get('/webp-to-avif', [ImageToolController::class, 'webpToAvif'])->name('tools.webp-to-avif');
+Route::get('/avif-to-jpg', [ImageToolController::class, 'avifToJpg'])->name('tools.avif-to-jpg');
+Route::get('/avif-to-png', [ImageToolController::class, 'avifToPng'])->name('tools.avif-to-png');
+
 // Compression Routes
 Route::get('/compress-jpg', [ImageToolController::class, 'compressJpg'])->name('tools.compress-jpg');
 Route::get('/compress-png', [ImageToolController::class, 'compressPng'])->name('tools.compress-png');

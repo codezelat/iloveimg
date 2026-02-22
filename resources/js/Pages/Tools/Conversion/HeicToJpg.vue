@@ -7,6 +7,7 @@
         action-button-text="Convert to JPG"
         :processing-function="convertToJpg"
         :is-loading-converter="isLoading"
+        output-format="jpeg"
     />
 </template>
 

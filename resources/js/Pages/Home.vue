@@ -20,7 +20,7 @@
                             All-in-one image studio for instant, private workflows.
                         </h1>
                         <p class="text-lg text-white/70 max-w-2xl">
-                            28+ pro-grade tools for conversion, compression, resizing, and editing — all powered by the Canvas API directly in your browser (now including HEIC and HEIF support).
+                            33+ pro-grade tools for conversion, compression, resizing, and editing — all powered by the Canvas API directly in your browser (now including HEIC, HEIF, and AVIF support).
                         </p>
                         <div class="flex flex-wrap gap-4">
                             <Link :href="route('tools.image-workbench')" class="btn-primary">
@@ -36,7 +36,7 @@
                                 <p>Uploads to server</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-semibold text-white">28</p>
+                                <p class="text-2xl font-semibold text-white">33</p>
                                 <p>Specialized utilities</p>
                             </div>
                             <div>
@@ -190,7 +190,7 @@ const heroHighlights = [
 const featureCards = [
     { icon: '🔒', title: 'Instant privacy', description: 'Images never leave your device. Canvas-only processing keeps everything local.' },
     { icon: '⚡', title: 'Speed obsessed', description: 'GPU-accelerated canvas rendering, efficient batching, and zero network hops.' },
-    { icon: '📱', title: 'HEIC ready', description: 'Import HEIC/HEIF shots from iPhone or iPad and convert them offline in one tap.' },
+    { icon: '📱', title: 'HEIC & AVIF ready', description: 'Import HEIC/HEIF from iPhone or next-gen AVIF images and convert them offline in one tap.' },
     { icon: '🧰', title: 'Full toolkit', description: 'Conversion, compression, resize, edit, and utilities in one place.' },
 ];
 </script>
