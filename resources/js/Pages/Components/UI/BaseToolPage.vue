@@ -106,7 +106,7 @@
                         <div class="h-2 rounded-full bg-white/10 overflow-hidden">
                             <div class="h-full rounded-full bg-gradient-to-r from-primary-500 to-orange-400 transition-all duration-300" :style="{ width: progress + '%' }"></div>
                         </div>
-                        <p class="text-xs text-white/50">{{ statusLabel }}</p>
+                        <p class="text-xs" :class="errorMessage ? 'text-red-400' : 'text-white/50'">{{ statusLabel }}</p>
                     </div>
 
                     <button
@@ -205,6 +205,7 @@ const {
 
 const selectedFiles = ref([]);
 const processedFiles = ref([]);
+const errorMessage = ref('');
 
 const totalSelectedSize = computed(() => {
     if (!selectedFiles.value.length) return '0 Bytes';
@@ -213,6 +214,9 @@ const totalSelectedSize = computed(() => {
 });
 
 const statusLabel = computed(() => {
+    if (errorMessage.value) {
+        return errorMessage.value;
+    }
     if (isProcessing.value) {
         return `Processing ${progress.value}% · Stay on this tab`;
     }
@@ -233,6 +237,7 @@ const removeFile = (index) => {
     const updated = [...selectedFiles.value];
     updated.splice(index, 1);
     selectedFiles.value = updated;
+    errorMessage.value = '';
     if (!updated.length) {
         processedFiles.value = [];
         progress.value = 0;
@@ -243,6 +248,7 @@ const processFiles = async () => {
     isProcessing.value = true;
     progress.value = 0;
     processedFiles.value = [];
+    errorMessage.value = '';
 
     const totalFiles = selectedFiles.value.length;
 
@@ -253,6 +259,7 @@ const processFiles = async () => {
             progress.value = Math.round(((i + 1) / totalFiles) * 100);
         } catch (error) {
             console.error('Error processing file:', error);
+            errorMessage.value = error.message || 'Failed to process image. Please try again.';
         }
     }
 
@@ -271,6 +278,7 @@ const reset = () => {
     selectedFiles.value = [];
     processedFiles.value = [];
     progress.value = 0;
+    errorMessage.value = '';
 };
 
 const formatFileSize = (bytes) => {

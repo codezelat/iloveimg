@@ -17,6 +17,25 @@ export function useImageProcessor() {
 
     const heicMimeTypes = ["image/heic", "image/heif"];
     const heicExtensionRegex = /\.(heic|heif)$/i;
+    
+    // Check file signature for HEIC format (more reliable than MIME type)
+    const checkHeicFileSignature = async (file) => {
+        try {
+            const buffer = await file.slice(0, 24).arrayBuffer();
+            const arr = new Uint8Array(buffer);
+            // Check for common HEIC/HEIF signatures
+            // ftypheic, ftypheix, ftyphevc, ftypheim, ftypmif1
+            const signature = Array.from(arr.slice(4, 12))
+                .map(b => String.fromCharCode(b))
+                .join('');
+            const isHeic = ['ftypheic', 'ftypheix', 'ftyphevc', 'ftypheim', 'ftypmif1'].includes(signature);
+            console.log("File signature check:", signature, "is HEIC:", isHeic);
+            return isHeic;
+        } catch (e) {
+            console.error("Failed to check file signature:", e);
+            return false;
+        }
+    };
 
     const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -30,31 +49,88 @@ export function useImageProcessor() {
     };
 
     const convertHeicToProcessable = async (file) => {
-        const isHeic =
-            heicMimeTypes.includes(file.type?.toLowerCase()) ||
-            heicExtensionRegex.test(file.name || "");
+        // Check by MIME type, extension, or file signature
+        const isHeicByMime = heicMimeTypes.includes(file.type?.toLowerCase());
+        const isHeicByExt = heicExtensionRegex.test(file.name || "");
+        const isHeicBySig = await checkHeicFileSignature(file);
+        
+        const isHeic = isHeicByMime || isHeicByExt || isHeicBySig;
+        
+        console.log("HEIC detection - MIME:", isHeicByMime, "Extension:", isHeicByExt, "Signature:", isHeicBySig);
 
         if (!isHeic) {
             return file;
         }
 
+        // Validate file
+        if (!file || file.size === 0) {
+            throw new Error("Invalid or empty file");
+        }
+
+        // Check file size (heic2any has issues with very large files)
+        const MAX_SIZE = 50 * 1024 * 1024; // 50MB limit
+        if (file.size > MAX_SIZE) {
+            throw new Error("File is too large. Maximum size is 50MB for HEIC conversion.");
+        }
+
         try {
-            const convertedBlob = await heic2any({
-                blob: file,
-                toType: "image/png",
-                quality: 1,
-            });
-            return new File([
-                convertedBlob instanceof Blob ? convertedBlob : new Blob([convertedBlob]),
-            ], file.name.replace(heicExtensionRegex, ".png"), {
-                type: "image/png",
+            console.log("Converting HEIC file:", file.name, "Size:", file.size, "Type:", file.type);
+            
+            // Try with multiple: false to get single image (not burst sequence)
+            let result;
+            try {
+                result = await heic2any({
+                    blob: file,
+                    toType: "image/png",
+                    quality: 0.95,
+                    multiple: false,  // Get single image, not array
+                });
+            } catch (err1) {
+                console.log("First attempt failed, trying with image/jpeg...");
+                // Try converting to JPEG instead (more compatible)
+                result = await heic2any({
+                    blob: file,
+                    toType: "image/jpeg",
+                    quality: 0.95,
+                    multiple: false,
+                });
+            }
+            
+            console.log("Conversion result type:", typeof result, "isArray:", Array.isArray(result));
+            
+            // heic2any can return a single Blob or an array of Blobs (for burst photos)
+            const blob = Array.isArray(result) ? result[0] : result;
+            
+            if (!(blob instanceof Blob)) {
+                console.error("Invalid blob result:", blob);
+                throw new Error("Invalid conversion result from heic2any");
+            }
+            
+            const outputType = blob.type || "image/png";
+            const extension = outputType === "image/jpeg" ? ".jpg" : ".png";
+            
+            console.log("Conversion successful, blob size:", blob.size, "type:", outputType);
+            
+            return new File([blob], file.name.replace(heicExtensionRegex, extension), {
+                type: outputType,
                 lastModified: Date.now(),
             });
         } catch (error) {
-            console.error("HEIC/HEIF conversion failed", error);
-            throw new Error(
-                "This browser cannot decode HEIC/HEIF files automatically. Try updating your browser or converting on another device."
-            );
+            console.error("HEIC/HEIF conversion failed:", error);
+            
+            // Provide specific error message based on the error
+            let errorMsg = "Failed to convert HEIC/HEIF file.";
+            
+            if (error.message && error.message.includes("fromHeic")) {
+                errorMsg += " This file may use an unsupported encoding format (like HEVC 10-bit).";
+            } else if (error.message && error.message.includes("memory")) {
+                errorMsg += " The file is too large for browser processing.";
+            } else {
+                errorMsg += " The file may be corrupted or use an unsupported encoding.";
+            }
+            
+            errorMsg += " Try exporting the image as JPEG from your device first.";
+            throw new Error(errorMsg);
         }
     };
 
@@ -212,7 +288,16 @@ export function useImageProcessor() {
     };
 
     const convertImage = async (file, targetFormat, quality = 0.92) => {
-        const safeFile = await prepareFileForCanvas(file);
+        console.log("convertImage called:", file?.name, "target:", targetFormat);
+        
+        let safeFile;
+        try {
+            safeFile = await prepareFileForCanvas(file);
+            console.log("File prepared for canvas:", safeFile.name, "type:", safeFile.type);
+        } catch (error) {
+            console.error("prepareFileForCanvas failed:", error);
+            throw error;
+        }
 
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -220,6 +305,7 @@ export function useImageProcessor() {
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
+                    console.log("Image loaded, dimensions:", img.width, "x", img.height);
                     const canvas = document.createElement("canvas");
                     canvas.width = img.width;
                     canvas.height = img.height;
@@ -229,6 +315,10 @@ export function useImageProcessor() {
 
                     canvas.toBlob(
                         (blob) => {
+                            if (!blob) {
+                                reject(new Error("Canvas toBlob returned null"));
+                                return;
+                            }
                             const convertedFile = new File(
                                 [blob],
                                 file.name.replace(
@@ -237,17 +327,24 @@ export function useImageProcessor() {
                                 ),
                                 { type: `image/${targetFormat}` }
                             );
+                            console.log("Conversion complete:", convertedFile.name);
                             resolve(convertedFile);
                         },
                         `image/${targetFormat}`,
                         quality
                     );
                 };
-                img.onerror = reject;
+                img.onerror = (e) => {
+                    console.error("Image load error:", e);
+                    reject(new Error("Failed to load image for conversion"));
+                };
                 img.src = e.target.result;
             };
 
-            reader.onerror = reject;
+            reader.onerror = (e) => {
+                console.error("FileReader error:", e);
+                reject(new Error("Failed to read file"));
+            };
             reader.readAsDataURL(safeFile);
         });
     };
