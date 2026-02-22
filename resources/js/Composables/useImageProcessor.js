@@ -8,13 +8,14 @@ let libheifLoading = null;
 const loadLibheif = async () => {
     if (libheifInstance) return libheifInstance;
     if (libheifLoading) return libheifLoading;
-    
+
     libheifLoading = (async () => {
-        const module = await import('/ffmpeg/libheif.mjs');
+        // @ts-ignore
+        const module = await import("/ffmpeg/libheif.mjs");
         libheifInstance = await module.default();
         return libheifInstance;
     })();
-    
+
     return libheifLoading;
 };
 
@@ -22,7 +23,8 @@ export function useImageProcessor() {
     const isProcessing = ref(false);
     const processedImages = ref([]);
     const progress = ref(0);
-    const { getOrientation, applyOrientation, stripExif, supportsExif } = useExif();
+    const { getOrientation, applyOrientation, stripExif, supportsExif } =
+        useExif();
 
     const supportedFormats = [
         { label: "JPEG", value: "jpeg" },
@@ -59,31 +61,34 @@ export function useImageProcessor() {
 
         try {
             console.log("Converting HEIC to PNG using libheif:", file.name);
-            
+
             const libheif = await loadLibheif();
-            
+
             // Read and decode HEIC
             const arrayBuffer = await file.arrayBuffer();
             const decoder = new libheif.HeifDecoder();
             const images = decoder.decode(new Uint8Array(arrayBuffer));
-            
+
             if (!images || images.length === 0) {
                 throw new Error("No images found in HEIC file");
             }
-            
+
             const image = images[0];
             const width = image.get_width();
             const height = image.get_height();
-            
+
             // Create canvas and decode
-            const canvas = document.createElement('canvas');
+            const canvas = document.createElement("canvas");
             canvas.width = width;
             canvas.height = height;
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext("2d");
             const imageData = ctx.createImageData(width, height);
-            
+
             await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => reject(new Error("HEIC decode timeout")), 30000);
+                const timeout = setTimeout(
+                    () => reject(new Error("HEIC decode timeout")),
+                    30000,
+                );
                 image.display(imageData, (displayData) => {
                     clearTimeout(timeout);
                     if (!displayData) {
@@ -93,16 +98,22 @@ export function useImageProcessor() {
                     }
                 });
             });
-            
+
             ctx.putImageData(imageData, 0, 0);
-            
+
             // Convert to PNG blob
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-            
-            return new File([blob], file.name.replace(heicExtensionRegex, '.png'), {
-                type: 'image/png',
-                lastModified: Date.now(),
-            });
+            const blob = await new Promise((resolve) =>
+                canvas.toBlob(resolve, "image/png"),
+            );
+
+            return new File(
+                [blob],
+                file.name.replace(heicExtensionRegex, ".png"),
+                {
+                    type: "image/png",
+                    lastModified: Date.now(),
+                },
+            );
         } catch (error) {
             console.error("HEIC conversion failed:", error);
             throw new Error(`Failed to convert HEIC file: ${error.message}`);
@@ -169,11 +180,11 @@ export function useImageProcessor() {
                         new File([blob], filename, {
                             type: mimeType,
                             lastModified: Date.now(),
-                        })
+                        }),
                     );
                 },
                 mimeType,
-                quality
+                quality,
             );
         });
     };
@@ -201,9 +212,11 @@ export function useImageProcessor() {
     };
 
     const calculateResizeDimensions = (img, resizeOptions = {}) => {
-        const mode = resizeOptions.mode || resizeOptions.resizeMode || "original";
+        const mode =
+            resizeOptions.mode || resizeOptions.resizeMode || "original";
         if (mode === "percentage") {
-            const percentage = clamp(resizeOptions.percentage || 100, 1, 500) / 100;
+            const percentage =
+                clamp(resizeOptions.percentage || 100, 1, 500) / 100;
             return {
                 width: Math.round(img.width * percentage),
                 height: Math.round(img.height * percentage),
@@ -214,7 +227,10 @@ export function useImageProcessor() {
         const targetHeight = resizeOptions.height || img.height;
 
         if (mode === "contain") {
-            const ratio = Math.min(targetWidth / img.width, targetHeight / img.height);
+            const ratio = Math.min(
+                targetWidth / img.width,
+                targetHeight / img.height,
+            );
             const safeRatio = ratio === Infinity ? 1 : ratio;
             return {
                 width: Math.round(img.width * safeRatio),
@@ -224,7 +240,10 @@ export function useImageProcessor() {
 
         if (mode === "exact") {
             if (resizeOptions.maintainAspect) {
-                const ratio = Math.min(targetWidth / img.width, targetHeight / img.height);
+                const ratio = Math.min(
+                    targetWidth / img.width,
+                    targetHeight / img.height,
+                );
                 const safeRatio = ratio === Infinity ? 1 : ratio;
                 return {
                     width: Math.round(img.width * safeRatio),
@@ -262,7 +281,12 @@ export function useImageProcessor() {
         });
     };
 
-    const convertImage = async (file, targetFormat, quality = 0.92, options = {}) => {
+    const convertImage = async (
+        file,
+        targetFormat,
+        quality = 0.92,
+        options = {},
+    ) => {
         const safeFile = await prepareFileForCanvas(file);
         const preserveExif = options.preserveExif !== false;
 
@@ -281,28 +305,35 @@ export function useImageProcessor() {
 
                     // Get orientation and apply if needed
                     const orientation = await getOrientation(file);
-                    const finalCanvas = orientation > 1 ? applyOrientation(canvas, orientation) : canvas;
+                    const finalCanvas =
+                        orientation > 1
+                            ? applyOrientation(canvas, orientation)
+                            : canvas;
 
                     // PNG doesn't support EXIF, so we can't preserve it
-                    const canPreserveExif = preserveExif && 
-                                           supportsExif(file) && 
-                                           targetFormat.toLowerCase() !== 'png';
+                    const canPreserveExif =
+                        preserveExif &&
+                        supportsExif(file) &&
+                        targetFormat.toLowerCase() !== "png";
 
-                    canvasToFile(finalCanvas, 
+                    canvasToFile(
+                        finalCanvas,
                         file.name.replace(/\.[^/.]+$/, `.${targetFormat}`),
                         `image/${targetFormat}`,
-                        quality
-                    ).then(async (convertedFile) => {
-                        // If we need to preserve EXIF and it's possible, we would need
-                        // a library like piexif.js to inject EXIF back. For now, 
-                        // we preserve by not stripping when target supports it.
-                        // Note: Canvas operations strip EXIF by default, so preserving
-                        // requires EXIF injection which is complex.
-                        resolve(convertedFile);
-                    }).catch(reject);
+                        quality,
+                    )
+                        .then(async (convertedFile) => {
+                            // If we need to preserve EXIF and it's possible, we would need
+                            // a library like piexif.js to inject EXIF back. For now,
+                            // we preserve by not stripping when target supports it.
+                            // Note: Canvas operations strip EXIF by default, so preserving
+                            // requires EXIF injection which is complex.
+                            resolve(convertedFile);
+                        })
+                        .catch(reject);
                 };
                 img.onerror = reject;
-                img.src = e.target.result;
+                img.src = /** @type {string} */ (e.target.result);
             };
 
             reader.onerror = reject;
@@ -315,7 +346,13 @@ export function useImageProcessor() {
         return await convertImage(file, format, quality, options);
     };
 
-    const resizeImage = async (file, width, height, maintainAspect = true, options = {}) => {
+    const resizeImage = async (
+        file,
+        width,
+        height,
+        maintainAspect = true,
+        options = {},
+    ) => {
         const safeFile = await prepareFileForCanvas(file);
         const preserveExif = options.preserveExif !== false;
 
@@ -330,7 +367,7 @@ export function useImageProcessor() {
                     if (maintainAspect) {
                         const ratio = Math.min(
                             width / img.width,
-                            height / img.height
+                            height / img.height,
                         );
                         canvas.width = img.width * ratio;
                         canvas.height = img.height * ratio;
@@ -344,13 +381,18 @@ export function useImageProcessor() {
 
                     // Apply EXIF orientation
                     const orientation = await getOrientation(file);
-                    const finalCanvas = orientation > 1 ? applyOrientation(canvas, orientation) : canvas;
+                    const finalCanvas =
+                        orientation > 1
+                            ? applyOrientation(canvas, orientation)
+                            : canvas;
 
                     // If not preserving EXIF, the blob will naturally not have it
-                    canvasToFile(finalCanvas, file.name, safeFile.type, 0.92).then(resolve).catch(reject);
+                    canvasToFile(finalCanvas, file.name, safeFile.type, 0.92)
+                        .then(resolve)
+                        .catch(reject);
                 };
                 img.onerror = reject;
-                img.src = e.target.result;
+                img.src = /** @type {string} */ (e.target.result);
             };
 
             reader.onerror = reject;
@@ -385,10 +427,12 @@ export function useImageProcessor() {
                     ctx.drawImage(img, -img.width / 2, -img.height / 2);
 
                     // Note: EXIF orientation is typically cleared on manual rotation
-                    canvasToFile(canvas, file.name, safeFile.type, 0.92).then(resolve).catch(reject);
+                    canvasToFile(canvas, file.name, safeFile.type, 0.92)
+                        .then(resolve)
+                        .catch(reject);
                 };
                 img.onerror = reject;
-                img.src = e.target.result;
+                img.src = /** @type {string} */ (e.target.result);
             };
 
             reader.onerror = reject;
@@ -453,17 +497,22 @@ export function useImageProcessor() {
                         0,
                         0,
                         cropArea.width,
-                        cropArea.height
+                        cropArea.height,
                     );
 
                     // Apply EXIF orientation
                     const orientation = await getOrientation(file);
-                    const finalCanvas = orientation > 1 ? applyOrientation(canvas, orientation) : canvas;
+                    const finalCanvas =
+                        orientation > 1
+                            ? applyOrientation(canvas, orientation)
+                            : canvas;
 
-                    canvasToFile(finalCanvas, file.name, safeFile.type, 0.92).then(resolve).catch(reject);
+                    canvasToFile(finalCanvas, file.name, safeFile.type, 0.92)
+                        .then(resolve)
+                        .catch(reject);
                 };
                 img.onerror = reject;
-                img.src = e.target.result;
+                img.src = /** @type {string} */ (e.target.result);
             };
 
             reader.onerror = reject;
@@ -568,7 +617,7 @@ export function useImageProcessor() {
                                 pos.x,
                                 pos.y,
                                 wmWidth,
-                                wmHeight
+                                wmHeight,
                             );
 
                             canvas.toBlob(
@@ -576,12 +625,12 @@ export function useImageProcessor() {
                                     const watermarkedFile = new File(
                                         [blob],
                                         file.name,
-                                        { type: safeFile.type }
+                                        { type: safeFile.type },
                                     );
                                     resolve(watermarkedFile);
                                 },
                                 safeFile.type,
-                                0.92
+                                0.92,
                             );
                         };
                         wmImg.onerror = reject;
@@ -594,17 +643,17 @@ export function useImageProcessor() {
                                 const watermarkedFile = new File(
                                     [blob],
                                     file.name,
-                                    { type: safeFile.type }
+                                    { type: safeFile.type },
                                 );
                                 resolve(watermarkedFile);
                             },
                             safeFile.type,
-                            0.92
+                            0.92,
                         );
                     }
                 };
                 img.onerror = reject;
-                img.src = e.target.result;
+                img.src = /** @type {string} */ (e.target.result);
             };
 
             reader.onerror = reject;
@@ -622,30 +671,35 @@ export function useImageProcessor() {
 
     const processPipeline = async (file, pipelineOptions = {}) => {
         const preserveExif = pipelineOptions.preserveExif !== false;
-        
+
         // Handle EXIF stripping before processing if requested
         let workingFile = file;
         if (!preserveExif && supportsExif(file)) {
             try {
                 workingFile = await stripExif(file);
             } catch (error) {
-                console.warn('Failed to strip EXIF, continuing with original:', error);
+                console.warn(
+                    "Failed to strip EXIF, continuing with original:",
+                    error,
+                );
             }
         }
 
         const dataUrl = await readFileAsDataUrl(workingFile);
         const img = await createImageFromSource(dataUrl);
 
-        const resizeOptions =
-            pipelineOptions.resize || {
-                mode: pipelineOptions.resizeMode,
-                width: pipelineOptions.width,
-                height: pipelineOptions.height,
-                percentage: pipelineOptions.percentage,
-                maintainAspect: pipelineOptions.maintainAspect,
-            };
+        const resizeOptions = pipelineOptions.resize || {
+            mode: pipelineOptions.resizeMode,
+            width: pipelineOptions.width,
+            height: pipelineOptions.height,
+            percentage: pipelineOptions.percentage,
+            maintainAspect: pipelineOptions.maintainAspect,
+        };
 
-        const { width, height } = calculateResizeDimensions(img, resizeOptions || {});
+        const { width, height } = calculateResizeDimensions(
+            img,
+            resizeOptions || {},
+        );
         const rotation = pipelineOptions.rotate || 0;
         const canvasSize = getCanvasSizeForRotation(width, height, rotation);
 
@@ -659,7 +713,7 @@ export function useImageProcessor() {
 
         const format = normalizeFormat(
             pipelineOptions.format,
-            file.type || `image/${file.name.split(".").pop()}`
+            file.type || `image/${file.name.split(".").pop()}`,
         );
 
         const backgroundColor = pipelineOptions.backgroundColor;

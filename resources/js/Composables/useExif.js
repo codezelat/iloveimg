@@ -1,4 +1,4 @@
-import EXIF from 'exif-js';
+import EXIF from "exif-js";
 
 /**
  * EXIF metadata handling composable
@@ -13,7 +13,12 @@ import EXIF from 'exif-js';
  */
 const supportsExif = (file) => {
     if (!file || !file.type) return false;
-    const supportedTypes = ['image/jpeg', 'image/jpg', 'image/tiff', 'image/tif'];
+    const supportedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/tiff",
+        "image/tif",
+    ];
     return supportedTypes.includes(file.type.toLowerCase());
 };
 
@@ -29,7 +34,8 @@ const extractExif = async (file) => {
 
     try {
         const exifData = await new Promise((resolve, reject) => {
-            EXIF.getData(file, function() {
+            // @ts-ignore
+            EXIF.getData(file, function () {
                 try {
                     const data = EXIF.getAllTags(this);
                     resolve(data);
@@ -46,7 +52,7 @@ const extractExif = async (file) => {
 
         return exifData;
     } catch (error) {
-        console.warn('EXIF extraction failed:', error);
+        console.warn("EXIF extraction failed:", error);
         return null;
     }
 };
@@ -63,14 +69,15 @@ const getOrientation = async (file) => {
 
     try {
         const orientation = await new Promise((resolve) => {
-            EXIF.getData(file, function() {
-                const orientation = EXIF.getTag(this, 'Orientation');
+            // @ts-ignore
+            EXIF.getData(file, function () {
+                const orientation = EXIF.getTag(this, "Orientation");
                 resolve(orientation || 1);
             });
         });
         return orientation;
     } catch (error) {
-        console.warn('Could not get orientation:', error);
+        console.warn("Could not get orientation:", error);
         return 1;
     }
 };
@@ -86,13 +93,13 @@ const applyOrientation = (canvas, orientation) => {
         return canvas;
     }
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     const width = canvas.width;
     const height = canvas.height;
 
     // Create a new canvas for the transformed image
-    const newCanvas = document.createElement('canvas');
-    const newCtx = newCanvas.getContext('2d');
+    const newCanvas = document.createElement("canvas");
+    const newCtx = newCanvas.getContext("2d");
 
     // Set dimensions based on orientation
     if (orientation > 4) {
@@ -160,22 +167,22 @@ const stripExif = async (file) => {
         return new Promise((resolve, reject) => {
             const img = new Image();
             img.onload = () => {
-                const canvas = document.createElement('canvas');
+                const canvas = document.createElement("canvas");
                 canvas.width = img.width;
                 canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                
+                const ctx = canvas.getContext("2d");
+
                 // Draw image without EXIF
                 ctx.drawImage(img, 0, 0);
-                
+
                 // Convert back to file without EXIF
-                const mimeType = file.type || 'image/jpeg';
-                const quality = mimeType === 'image/jpeg' ? 0.92 : undefined;
-                
+                const mimeType = file.type || "image/jpeg";
+                const quality = mimeType === "image/jpeg" ? 0.92 : undefined;
+
                 canvas.toBlob(
                     (blob) => {
                         if (!blob) {
-                            reject(new Error('Failed to strip EXIF data'));
+                            reject(new Error("Failed to strip EXIF data"));
                             return;
                         }
                         const strippedFile = new File([blob], file.name, {
@@ -185,14 +192,15 @@ const stripExif = async (file) => {
                         resolve(strippedFile);
                     },
                     mimeType,
-                    quality
+                    quality,
                 );
             };
-            img.onerror = () => reject(new Error('Failed to load image for EXIF stripping'));
+            img.onerror = () =>
+                reject(new Error("Failed to load image for EXIF stripping"));
             img.src = URL.createObjectURL(file);
         });
     } catch (error) {
-        console.warn('EXIF stripping failed:', error);
+        console.warn("EXIF stripping failed:", error);
         return file;
     }
 };
@@ -215,7 +223,7 @@ const formatGpsCoordinates = (exifData) => {
     const convertToDecimal = (coords, ref) => {
         if (!Array.isArray(coords) || coords.length < 3) return null;
         let decimal = coords[0] + coords[1] / 60 + coords[2] / 3600;
-        if (ref === 'S' || ref === 'W') decimal = -decimal;
+        if (ref === "S" || ref === "W") decimal = -decimal;
         return decimal;
     };
 
@@ -235,15 +243,18 @@ const formatGpsCoordinates = (exifData) => {
 const formatDateTaken = (exifData) => {
     if (!exifData) return null;
 
-    const dateTime = exifData.DateTime || exifData.DateTimeOriginal || exifData.DateTimeDigitized;
+    const dateTime =
+        exifData.DateTime ||
+        exifData.DateTimeOriginal ||
+        exifData.DateTimeDigitized;
     if (!dateTime) return null;
 
     // EXIF date format: "YYYY:MM:DD HH:MM:SS"
-    const parts = dateTime.split(' ');
+    const parts = dateTime.split(" ");
     if (parts.length !== 2) return dateTime;
 
     const [datePart, timePart] = parts;
-    const formattedDate = datePart.replace(/:/g, '-');
+    const formattedDate = datePart.replace(/:/g, "-");
     return `${formattedDate} ${timePart}`;
 };
 
@@ -261,7 +272,9 @@ const getCameraInfo = (exifData) => {
     if (!make && !model) return null;
     if (make && model) {
         // Remove make from model if model includes it
-        const cleanModel = model.includes(make) ? model.replace(make, '').trim() : model;
+        const cleanModel = model.includes(make)
+            ? model.replace(make, "").trim()
+            : model;
         return `${make} ${cleanModel}`.trim();
     }
     return (make || model).trim();
@@ -274,14 +287,14 @@ const getCameraInfo = (exifData) => {
  */
 const getOrientationDescription = (orientation) => {
     const descriptions = {
-        1: 'Normal (0°)',
-        2: 'Flipped horizontally',
-        3: 'Rotated 180°',
-        4: 'Flipped vertically',
-        5: 'Rotated 90° CW, flipped',
-        6: 'Rotated 90° CW',
-        7: 'Rotated 270° CW, flipped',
-        8: 'Rotated 270° CW',
+        1: "Normal (0°)",
+        2: "Flipped horizontally",
+        3: "Rotated 180°",
+        4: "Flipped vertically",
+        5: "Rotated 90° CW, flipped",
+        6: "Rotated 90° CW",
+        7: "Rotated 270° CW, flipped",
+        8: "Rotated 270° CW",
     };
     return descriptions[orientation] || `Orientation ${orientation}`;
 };
