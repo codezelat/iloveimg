@@ -43,5 +43,11 @@ Route::get('/base64-to-image', [ImageToolController::class, 'base64ToImage'])->n
 // Advanced Suite
 Route::get('/image-workbench', [ImageToolController::class, 'imageWorkbench'])->name('tools.image-workbench');
 
-// Privacy Page
+// Legal Pages
 Route::get('/privacy', [ImageToolController::class, 'privacy'])->name('privacy');
+Route::get('/privacy-policy', fn() => redirect('/privacy'));
+Route::get('/terms', [ImageToolController::class, 'terms'])->name('terms');
+Route::get('/terms-of-service', fn() => redirect('/terms'));
+
+// 404 Catch-All
+Route::fallback(fn() => Inertia\Inertia::render('NotFound'));

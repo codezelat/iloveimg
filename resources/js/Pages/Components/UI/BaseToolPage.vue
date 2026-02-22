@@ -18,7 +18,7 @@
                         <div class="flex flex-wrap gap-3 text-xs uppercase tracking-widest text-white/70">
                             <span class="px-4 py-1.5 rounded-full bg-white/10 border border-white/20">{{ fileTypeLabel }}</span>
                             <span class="px-4 py-1.5 rounded-full bg-white/10 border border-white/20">{{ actionButtonText }}</span>
-                            <span class="px-4 py-1.5 rounded-full bg-white/10 border border-white/20">Batch ready</span>
+                            <span class="px-4 py-1.5 rounded-full bg-white/10 border border-white/20">100MB Max</span>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
@@ -55,6 +55,16 @@
                         </div>
                         <span class="px-4 py-1 rounded-full text-xs uppercase tracking-widest bg-white/10 text-white/70">Drop · Paste · Browse</span>
                     </div>
+                    
+                    <!-- File Size Warning -->
+                    <div v-if="oversizedFiles.length" class="rounded-2xl border border-red-500/30 bg-red-500/10 p-4">
+                        <p class="text-red-300 font-medium mb-2">⚠️ Files too large</p>
+                        <p class="text-sm text-red-200/80">These files exceed 100MB limit:</p>
+                        <ul class="text-xs text-red-200/60 mt-1 space-y-1">
+                            <li v-for="file in oversizedFiles" :key="file.name">• {{ file.name }} ({{ formatFileSize(file.size) }})</li>
+                        </ul>
+                    </div>
+                    
                     <FileUploader
                         v-model="selectedFiles"
                         :accept="acceptedFormats"
@@ -65,16 +75,17 @@
 
                     <div v-if="selectedFiles.length" class="space-y-4">
                         <div class="flex items-center justify-between text-sm text-white/60">
-                            <p>{{ selectedFiles.length }} file{{ selectedFiles.length === 1 ? '' : 's' }} queued · {{ totalSelectedSize }}</p>
+                            <p>{{ validFiles.length }} file{{ validFiles.length === 1 ? '' : 's' }} queued · {{ totalSelectedSize }}</p>
                             <button class="text-primary-200 hover:text-primary-100" @click="reset">
                                 Reset
                             </button>
                         </div>
                         <div class="space-y-3 max-h-[280px] overflow-y-auto pr-2">
                             <div
-                                v-for="(file, index) in selectedFiles"
+                                v-for="(file, index) in validFiles"
                                 :key="`${file.name}-${index}`"
                                 class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 p-4"
+                                :class="{ 'border-red-500/30 bg-red-500/5': isFileOversized(file) }"
                             >
                                 <div class="flex items-center gap-4 min-w-0">
                                     <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500/60 to-orange-400/60 flex items-center justify-center text-sm font-semibold">
@@ -82,7 +93,10 @@
                                     </div>
                                     <div class="min-w-0">
                                         <p class="text-white font-medium truncate">{{ file.name }}</p>
-                                        <p class="text-xs text-white/60">{{ formatFileSize(file.size) }}</p>
+                                        <p class="text-xs" :class="isFileOversized(file) ? 'text-red-400' : 'text-white/60'">
+                                            {{ formatFileSize(file.size) }}
+                                            <span v-if="isFileOversized(file)" class="text-red-400 ml-2">(Too large)</span>
+                                        </p>
                                     </div>
                                 </div>
                                 <button class="text-white/50 hover:text-white" @click="removeFile(index)">✕</button>
@@ -113,10 +127,15 @@
                     <button
                         v-if="!processedFiles.length"
                         class="btn-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="!selectedFiles.length || isProcessing || isLoadingConverter"
+                        :disabled="!validFiles.length || isProcessing || isLoadingConverter"
                         @click="processFiles"
                     >
-                        <span v-if="isLoadingConverter">Loading converter...</span>
+                        <span v-if="isLoadingConverter">
+                            <span class="inline-flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                Loading converter...
+                            </span>
+                        </span>
                         <span v-else-if="isProcessing">Hold tight…</span>
                         <span v-else>{{ actionButtonText }}</span>
                     </button>
@@ -125,6 +144,15 @@
                     <div v-else class="space-y-3">
                         <button class="btn-primary w-full justify-center" @click="downloadAllFiles">
                             Download All ({{ processedFiles.length }})
+                        </button>
+                        <button v-if="processedFiles.length > 1" class="btn-secondary w-full justify-center" @click="downloadAsZip">
+                            <span v-if="isCreatingZip">
+                                <span class="inline-flex items-center gap-2">
+                                    <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                    Creating ZIP...
+                                </span>
+                            </span>
+                            <span v-else>Download as ZIP</span>
                         </button>
                         <button class="btn-secondary w-full justify-center" @click="reset">
                             Start New Batch
@@ -137,6 +165,7 @@
                             <li>• Automatic aspect ratio protection</li>
                             <li>• Color-safe conversion for JPEG & WEBP targets</li>
                             <li>• Local batch downloads with progress pacing</li>
+                            <li>• 100MB file size limit for browser stability</li>
                         </ul>
                     </div>
                 </aside>
@@ -151,6 +180,10 @@
                     </div>
                     <div class="flex flex-wrap gap-3">
                         <button class="btn-primary" @click="downloadAllFiles">Download All</button>
+                        <button v-if="processedFiles.length > 1" class="btn-secondary" @click="downloadAsZip">
+                            <span v-if="isCreatingZip">Creating...</span>
+                            <span v-else>Download ZIP</span>
+                        </button>
                         <button class="btn-secondary" @click="reset">Start New Batch</button>
                     </div>
                 </div>
@@ -161,8 +194,8 @@
                         :key="`processed-${index}`"
                         class="rounded-2xl border border-white/10 bg-white/5 p-4 flex items-center justify-between gap-4"
                     >
-                        <div class="space-y-1">
-                            <p class="text-white font-medium">{{ file.name }}</p>
+                        <div class="space-y-1 min-w-0">
+                            <p class="text-white font-medium truncate">{{ file.name }}</p>
                             <p class="text-xs text-white/60">{{ formatFileSize(file.size) }}</p>
                         </div>
                         <button class="btn-secondary text-sm" @click="downloadFile(file)">Download</button>
@@ -175,6 +208,8 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 import AppLayout from '../Layout/AppLayout.vue';
 import FileUploader from './FileUploader.vue';
 import SeoHead from '../../../Components/SeoHead.vue';
@@ -205,6 +240,8 @@ const props = defineProps({
     }
 });
 
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+
 const seoKeywords = computed(() => [
     props.toolName,
     props.fileTypeLabel,
@@ -223,10 +260,21 @@ const {
 const selectedFiles = ref([]);
 const processedFiles = ref([]);
 const errorMessage = ref('');
+const isCreatingZip = ref(false);
+
+const isFileOversized = (file) => file.size > MAX_FILE_SIZE;
+
+const oversizedFiles = computed(() => 
+    selectedFiles.value.filter(file => isFileOversized(file))
+);
+
+const validFiles = computed(() => 
+    selectedFiles.value.filter(file => !isFileOversized(file))
+);
 
 const totalSelectedSize = computed(() => {
-    if (!selectedFiles.value.length) return '0 Bytes';
-    const total = selectedFiles.value.reduce((sum, file) => sum + (file.size || 0), 0);
+    if (!validFiles.value.length) return '0 Bytes';
+    const total = validFiles.value.reduce((sum, file) => sum + (file.size || 0), 0);
     return formatFileSize(total);
 });
 
@@ -240,6 +288,9 @@ const statusLabel = computed(() => {
     if (!selectedFiles.value.length) {
         return 'Add files to activate the pipeline';
     }
+    if (oversizedFiles.value.length > 0) {
+        return `${oversizedFiles.value.length} file(s) exceed 100MB limit`;
+    }
     if (processedFiles.value.length) {
         return 'Batch ready · Download anytime';
     }
@@ -248,6 +299,7 @@ const statusLabel = computed(() => {
 
 const handleFilesSelected = (files) => {
     selectedFiles.value = files;
+    errorMessage.value = '';
 };
 
 const removeFile = (index) => {
@@ -262,16 +314,21 @@ const removeFile = (index) => {
 };
 
 const processFiles = async () => {
+    if (validFiles.value.length === 0) {
+        errorMessage.value = 'No valid files to process. Check file sizes.';
+        return;
+    }
+    
     isProcessing.value = true;
     progress.value = 0;
     processedFiles.value = [];
     errorMessage.value = '';
 
-    const totalFiles = selectedFiles.value.length;
+    const totalFiles = validFiles.value.length;
 
     for (let i = 0; i < totalFiles; i++) {
         try {
-            const processed = await props.processingFunction(selectedFiles.value[i]);
+            const processed = await props.processingFunction(validFiles.value[i]);
             processedFiles.value.push(processed);
             progress.value = Math.round(((i + 1) / totalFiles) * 100);
         } catch (error) {
@@ -299,6 +356,43 @@ const downloadFile = (file) => {
 
 const downloadAllFiles = () => {
     downloadFiles(processedFiles.value);
+};
+
+const downloadAsZip = async () => {
+    if (processedFiles.value.length < 2) return;
+    
+    isCreatingZip.value = true;
+    
+    try {
+        const zip = new JSZip();
+        const folderName = props.toolName.replace(/\s+/g, '_').toLowerCase();
+        const folder = zip.folder(folderName);
+        
+        // Add all files to zip
+        processedFiles.value.forEach((file, index) => {
+            const arrayBufferPromise = file.arrayBuffer();
+            folder.file(file.name, arrayBufferPromise);
+        });
+        
+        // Generate zip
+        const content = await zip.generateAsync({ 
+            type: 'blob',
+            compression: 'DEFLATE',
+            compressionOptions: { level: 6 }
+        }, (metadata) => {
+            // Could show progress here if needed
+        });
+        
+        // Download
+        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+        saveAs(content, `${folderName}_${timestamp}.zip`);
+        
+    } catch (error) {
+        console.error('ZIP creation failed:', error);
+        errorMessage.value = 'Failed to create ZIP. Try downloading individually.';
+    } finally {
+        isCreatingZip.value = false;
+    }
 };
 
 const reset = () => {

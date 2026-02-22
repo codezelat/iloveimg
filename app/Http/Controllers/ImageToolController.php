@@ -215,7 +215,12 @@ public function rotateImage()
 
     public function privacy()
     {
-        return Inertia::render('Privacy');
+        return Inertia::render('PrivacyPolicy');
+    }
+    
+    public function terms()
+    {
+        return Inertia::render('TermsOfService');
     }
 
     // Home page
