@@ -300,35 +300,47 @@ const statusLabel = computed(() => {
 const getFileFingerprint = (file) => `${file.name}-${file.size}-${file.lastModified}`;
 
 const handleFilesSelected = (files) => {
-    // Check for duplicates
+    // FileUploader sends all files (existing + new), so find only truly new ones
     const existingFingerprints = new Set(selectedFiles.value.map(getFileFingerprint));
-    const duplicates = [];
     const newFiles = [];
+    const duplicates = [];
+    const seenInNewBatch = new Set(); // Track within the new batch too
     
     for (const file of files) {
         const fingerprint = getFileFingerprint(file);
+        
+        // Skip if already in selectedFiles (existing)
         if (existingFingerprints.has(fingerprint)) {
-            duplicates.push(file.name);
-        } else {
-            newFiles.push(file);
-            existingFingerprints.add(fingerprint);
+            // This is an existing file being re-emitted, skip it
+            continue;
         }
+        
+        // Check for duplicates within the new batch itself
+        if (seenInNewBatch.has(fingerprint)) {
+            duplicates.push(file.name);
+            continue;
+        }
+        
+        // Truly new file
+        newFiles.push(file);
+        seenInNewBatch.add(fingerprint);
     }
     
-    // Show warning for duplicates
+    // Show warning for duplicates within the batch
     if (duplicates.length > 0) {
         errorMessage.value = duplicates.length === 1 
-            ? `"${duplicates[0]}" is already in the queue`
-            : `${duplicates.length} files are already in the queue: ${duplicates.join(', ').substring(0, 50)}...`;
+            ? `"${duplicates[0]}" appears multiple times`
+            : `${duplicates.length} duplicate files removed`;
         
         // Auto-clear error after 3 seconds
         setTimeout(() => {
-            if (errorMessage.value.includes('already in the queue')) {
+            if (errorMessage.value.includes('duplicate') || errorMessage.value.includes('multiple')) {
                 errorMessage.value = '';
             }
         }, 3000);
     }
     
+    // Add truly new files
     selectedFiles.value = [...selectedFiles.value, ...newFiles];
 };
 

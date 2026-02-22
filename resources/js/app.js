@@ -9,9 +9,11 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 const appName = import.meta.env.VITE_APP_NAME || 'ILoveIMG';
 
 // Initialize Sentry only if DSN is configured
+// Vite exposes env vars to client only if they start with VITE_
 const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
 
 if (sentryDsn) {
+    console.log('[Sentry] DSN found, initializing...');
     import('@sentry/vue').then((Sentry) => {
         Sentry.init({
             dsn: sentryDsn,
