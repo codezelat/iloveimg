@@ -29,6 +29,25 @@ Route::get('/webp-to-avif', [ImageToolController::class, 'webpToAvif'])->name('t
 Route::get('/avif-to-jpg', [ImageToolController::class, 'avifToJpg'])->name('tools.avif-to-jpg');
 Route::get('/avif-to-png', [ImageToolController::class, 'avifToPng'])->name('tools.avif-to-png');
 
+// ICO Conversion Routes (High Value)
+Route::get('/png-to-ico', [ImageToolController::class, 'pngToIco'])->name('tools.png-to-ico');
+Route::get('/jpg-to-ico', [ImageToolController::class, 'jpgToIco'])->name('tools.jpg-to-ico');
+Route::get('/webp-to-ico', [ImageToolController::class, 'webpToIco'])->name('tools.webp-to-ico');
+
+// Complete Coverage (Low Value)
+Route::get('/gif-to-webp', [ImageToolController::class, 'gifToWebp'])->name('tools.gif-to-webp');
+Route::get('/jpg-to-gif', [ImageToolController::class, 'jpgToGif'])->name('tools.jpg-to-gif');
+Route::get('/png-to-gif', [ImageToolController::class, 'pngToGif'])->name('tools.png-to-gif');
+Route::get('/webp-to-gif', [ImageToolController::class, 'webpToGif'])->name('tools.webp-to-gif');
+
+// BMP/TIFF Coverage (Complete Matrix)
+Route::get('/jpg-to-bmp', [ImageToolController::class, 'jpgToBmp'])->name('tools.jpg-to-bmp');
+Route::get('/jpg-to-tiff', [ImageToolController::class, 'jpgToTiff'])->name('tools.jpg-to-tiff');
+Route::get('/png-to-bmp', [ImageToolController::class, 'pngToBmp'])->name('tools.png-to-bmp');
+Route::get('/png-to-tiff', [ImageToolController::class, 'pngToTiff'])->name('tools.png-to-tiff');
+Route::get('/webp-to-bmp', [ImageToolController::class, 'webpToBmp'])->name('tools.webp-to-bmp');
+Route::get('/webp-to-tiff', [ImageToolController::class, 'webpToTiff'])->name('tools.webp-to-tiff');
+
 // Compression Routes
 Route::get('/compress-jpg', [ImageToolController::class, 'compressJpg'])->name('tools.compress-jpg');
 Route::get('/compress-png', [ImageToolController::class, 'compressPng'])->name('tools.compress-png');

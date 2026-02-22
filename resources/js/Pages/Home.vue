@@ -20,7 +20,7 @@
                             All-in-one image studio for instant, private workflows.
                         </h1>
                         <p class="text-lg text-white/70 max-w-2xl">
-                            33+ pro-grade tools for conversion, compression, resizing, and editing — all powered by the Canvas API directly in your browser (now including HEIC, HEIF, and AVIF support).
+                            46+ pro-grade tools for conversion, compression, resizing, and editing — all powered by the Canvas API directly in your browser (now including HEIC, HEIF, and AVIF support).
                         </p>
                         <div class="flex flex-wrap gap-4">
                             <Link :href="route('tools.image-workbench')" class="btn-primary">
@@ -36,7 +36,7 @@
                                 <p>Uploads to server</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-semibold text-white">33</p>
+                                <p class="text-2xl font-semibold text-white">46</p>
                                 <p>Specialized utilities</p>
                             </div>
                             <div>
@@ -54,17 +54,39 @@
                 </div>
 
                 <div class="relative z-10 mt-10 grid gap-6 md:grid-cols-[1.2fr_0.8fr]">
-                    <div class="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-5">
+                    <div class="relative flex items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-5">
                         <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z" />
                         </svg>
                         <input
+                            ref="searchInput"
                             v-model="searchTerm"
                             type="search"
                             placeholder="Search formats, e.g. WEBP, HEIC, resize"
                             class="w-full bg-transparent py-4 text-white placeholder-white/50 focus:outline-none"
                         />
-                        <span v-if="searchTerm" class="text-xs text-white/60 cursor-pointer" @click="searchTerm = ''">Clear</span>
+                        <span v-if="searchTerm" class="text-xs text-white/60 cursor-pointer" @click="clearSearch">Clear</span>
+                        
+                        <!-- Scroll indicator when searching -->
+                        <Transition
+                            enter-active-class="transition-all duration-300"
+                            enter-from-class="opacity-0 translate-y-2"
+                            enter-to-class="opacity-100 translate-y-0"
+                            leave-active-class="transition-all duration-200"
+                            leave-from-class="opacity-100 translate-y-0"
+                            leave-to-class="opacity-0 translate-y-2"
+                        >
+                            <button
+                                v-if="searchTerm && !hasScrolledToResults"
+                                @click="scrollToResults"
+                                class="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-500/20 border border-primary-500/30 text-primary-300 text-xs whitespace-nowrap hover:bg-primary-500/30 transition-colors"
+                            >
+                                <span>{{ filteredToolCount }} results</span>
+                                <svg class="w-3.5 h-3.5 animate-bounce" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                </svg>
+                            </button>
+                        </Transition>
                     </div>
                     <div class="rounded-3xl border border-white/10 bg-white/5 p-5 text-sm text-white/70">
                         <p class="font-semibold text-white/80">Zero learning curve</p>
@@ -145,7 +167,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import AppLayout from './Components/Layout/AppLayout.vue';
 import SeoHead from '../Components/SeoHead.vue';
@@ -158,8 +180,52 @@ const props = defineProps({
 });
 
 const searchTerm = ref('');
+const searchInput = ref(null);
+const hasScrolledToResults = ref(false);
+let scrollTimeout = null;
 
 const normalizedCategories = computed(() => props.tools || []);
+
+const filteredToolCount = computed(() => {
+    return filteredCategories.value.reduce((sum, cat) => sum + cat.tools.length, 0);
+});
+
+const clearSearch = () => {
+    searchTerm.value = '';
+    hasScrolledToResults.value = false;
+    searchInput.value?.focus();
+};
+
+const scrollToResults = () => {
+    const toolsSection = document.getElementById('tools');
+    if (toolsSection) {
+        toolsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        hasScrolledToResults.value = true;
+    }
+};
+
+// Auto-scroll to results when user types
+watch(searchTerm, (newVal) => {
+    if (!newVal) {
+        hasScrolledToResults.value = false;
+        return;
+    }
+    
+    // Clear existing timeout
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+    
+    // Wait for user to pause typing, then scroll
+    scrollTimeout = setTimeout(() => {
+        if (newVal && filteredToolCount.value > 0 && !hasScrolledToResults.value) {
+            scrollToResults();
+        }
+    }, 800); // 800ms after user stops typing
+});
+
+// Reset scroll flag when search is cleared or changed significantly
+watch(() => filteredCategories.value, () => {
+    hasScrolledToResults.value = false;
+}, { deep: true });
 
 const filteredCategories = computed(() => {
     const term = searchTerm.value.trim().toLowerCase();

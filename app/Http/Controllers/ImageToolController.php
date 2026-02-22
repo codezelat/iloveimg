@@ -270,6 +270,113 @@ public function rotateImage()
         ]);
     }
 
+    // ICO conversion routes (HIGH VALUE)
+    public function pngToIco()
+    {
+        return Inertia::render('Tools/Conversion/PngToIco', [
+            'toolName' => 'PNG to ICO',
+            'description' => 'Convert PNG images to Windows ICO format for favicons and app icons'
+        ]);
+    }
+
+    public function jpgToIco()
+    {
+        return Inertia::render('Tools/Conversion/JpgToIco', [
+            'toolName' => 'JPG to ICO',
+            'description' => 'Convert JPG images to Windows ICO format for favicons and app icons'
+        ]);
+    }
+
+    public function webpToIco()
+    {
+        return Inertia::render('Tools/Conversion/WebpToIco', [
+            'toolName' => 'WEBP to ICO',
+            'description' => 'Convert WEBP images to Windows ICO format for favicons and app icons'
+        ]);
+    }
+
+    // Low value but complete coverage
+    public function gifToWebp()
+    {
+        return Inertia::render('Tools/Conversion/GifToWebp', [
+            'toolName' => 'GIF to WEBP',
+            'description' => 'Convert GIF images to WEBP format for better compression'
+        ]);
+    }
+
+    public function jpgToGif()
+    {
+        return Inertia::render('Tools/Conversion/JpgToGif', [
+            'toolName' => 'JPG to GIF',
+            'description' => 'Convert JPG images to GIF format'
+        ]);
+    }
+
+    public function pngToGif()
+    {
+        return Inertia::render('Tools/Conversion/PngToGif', [
+            'toolName' => 'PNG to GIF',
+            'description' => 'Convert PNG images to GIF format'
+        ]);
+    }
+
+    public function webpToGif()
+    {
+        return Inertia::render('Tools/Conversion/WebpToGif', [
+            'toolName' => 'WEBP to GIF',
+            'description' => 'Convert WEBP images to GIF format'
+        ]);
+    }
+
+    // Complete BMP/TIFF coverage
+    public function jpgToBmp()
+    {
+        return Inertia::render('Tools/Conversion/JpgToBmp', [
+            'toolName' => 'JPG to BMP',
+            'description' => 'Convert JPG images to BMP bitmap format'
+        ]);
+    }
+
+    public function jpgToTiff()
+    {
+        return Inertia::render('Tools/Conversion/JpgToTiff', [
+            'toolName' => 'JPG to TIFF',
+            'description' => 'Convert JPG images to TIFF format for print and archiving'
+        ]);
+    }
+
+    public function pngToBmp()
+    {
+        return Inertia::render('Tools/Conversion/PngToBmp', [
+            'toolName' => 'PNG to BMP',
+            'description' => 'Convert PNG images to BMP bitmap format'
+        ]);
+    }
+
+    public function pngToTiff()
+    {
+        return Inertia::render('Tools/Conversion/PngToTiff', [
+            'toolName' => 'PNG to TIFF',
+            'description' => 'Convert PNG images to TIFF format with transparency support'
+        ]);
+    }
+
+    public function webpToBmp()
+    {
+        return Inertia::render('Tools/Conversion/WebpToBmp', [
+            'toolName' => 'WEBP to BMP',
+            'description' => 'Convert WEBP images to BMP bitmap format'
+        ]);
+    }
+
+    public function webpToTiff()
+    {
+        return Inertia::render('Tools/Conversion/WebpToTiff', [
+            'toolName' => 'WEBP to TIFF',
+            'description' => 'Convert WEBP images to TIFF format'
+        ]);
+    }
+
     public function privacy()
     {
         return Inertia::render('PrivacyPolicy');
@@ -315,6 +422,19 @@ public function rotateImage()
                     ['name' => 'WEBP to AVIF', 'path' => 'webp-to-avif'],
                     ['name' => 'AVIF to JPG', 'path' => 'avif-to-jpg'],
                     ['name' => 'AVIF to PNG', 'path' => 'avif-to-png'],
+                    ['name' => 'PNG to ICO', 'path' => 'png-to-ico'],
+                    ['name' => 'JPG to ICO', 'path' => 'jpg-to-ico'],
+                    ['name' => 'WEBP to ICO', 'path' => 'webp-to-ico'],
+                    ['name' => 'GIF to WEBP', 'path' => 'gif-to-webp'],
+                    ['name' => 'JPG to GIF', 'path' => 'jpg-to-gif'],
+                    ['name' => 'PNG to GIF', 'path' => 'png-to-gif'],
+                    ['name' => 'WEBP to GIF', 'path' => 'webp-to-gif'],
+                    ['name' => 'JPG to BMP', 'path' => 'jpg-to-bmp'],
+                    ['name' => 'JPG to TIFF', 'path' => 'jpg-to-tiff'],
+                    ['name' => 'PNG to BMP', 'path' => 'png-to-bmp'],
+                    ['name' => 'PNG to TIFF', 'path' => 'png-to-tiff'],
+                    ['name' => 'WEBP to BMP', 'path' => 'webp-to-bmp'],
+                    ['name' => 'WEBP to TIFF', 'path' => 'webp-to-tiff'],
                 ]
             ],
             [
