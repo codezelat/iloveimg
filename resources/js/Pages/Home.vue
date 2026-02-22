@@ -2,8 +2,8 @@
     <AppLayout>
         <SeoHead
             title="All-in-one browser image toolkit"
-            description="Process HEIC, JPG, PNG, GIF, WEBP, BMP, and TIFF files entirely in your browser with ILoveIMG Studio's 26+ tools."
-            :keywords="['image toolkit', 'heic to jpg', 'compress images', 'browser image editor']"
+            description="Process HEIC, JPG, PNG, GIF, WEBP, BMP, TIFF, AVIF, and SVG files entirely in your browser with ILoveIMG Studio's 33+ tools."
+            :keywords="['image toolkit', 'heic to jpg', 'avif converter', 'svg to png', 'compress images', 'browser image editor', 'favicon generator']"
         />
         <div class="space-y-16">
             <section class="relative overflow-hidden rounded-[40px] border border-white/10 bg-gradient-to-br from-white/5 via-transparent to-white/10 p-12">
@@ -181,7 +181,7 @@ const filteredCountCopy = computed(() => {
 });
 
 const heroHighlights = [
-    { label: 'Formats covered', value: '12+ (incl. HEIC)' },
+    { label: 'Formats covered', value: '15+ (HEIC, AVIF, SVG)' },
     { label: 'Compression presets', value: '4 levels' },
     { label: 'Resize strategies', value: '3 modes' },
     { label: 'Utility extras', value: 'Base64, watermark, more' },
