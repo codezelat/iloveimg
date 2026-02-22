@@ -109,14 +109,27 @@
                         <p class="text-xs" :class="errorMessage ? 'text-red-400' : 'text-white/50'">{{ statusLabel }}</p>
                     </div>
 
+                    <!-- Show Convert button when no processed files -->
                     <button
+                        v-if="!processedFiles.length"
                         class="btn-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="!selectedFiles.length || isProcessing"
+                        :disabled="!selectedFiles.length || isProcessing || isLoadingConverter"
                         @click="processFiles"
                     >
-                        <span v-if="isProcessing">Hold tight…</span>
+                        <span v-if="isLoadingConverter">Loading converter...</span>
+                        <span v-else-if="isProcessing">Hold tight…</span>
                         <span v-else>{{ actionButtonText }}</span>
                     </button>
+                    
+                    <!-- Show Download buttons when processed files are ready -->
+                    <div v-else class="space-y-3">
+                        <button class="btn-primary w-full justify-center" @click="downloadAllFiles">
+                            Download All ({{ processedFiles.length }})
+                        </button>
+                        <button class="btn-secondary w-full justify-center" @click="reset">
+                            Start New Batch
+                        </button>
+                    </div>
 
                     <div class="space-y-2 text-sm text-white/60">
                         <p class="font-semibold text-white/80">Smart defaults</p>
@@ -129,7 +142,7 @@
                 </aside>
             </div>
 
-            <section v-if="processedFiles.length" class="rounded-[32px] border border-white/10 bg-white/5 p-8 space-y-6">
+            <section v-if="processedFiles.length" class="processed-downloads rounded-[32px] border border-white/10 bg-white/5 p-8 space-y-6">
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <div>
                         <p class="text-sm uppercase tracking-[0.4em] text-white/50">Step 3</p>
@@ -185,6 +198,10 @@ const props = defineProps({
     processingFunction: {
         type: Function,
         required: true
+    },
+    isLoadingConverter: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -264,6 +281,16 @@ const processFiles = async () => {
     }
 
     isProcessing.value = false;
+    
+    // Auto-scroll to downloads section after a short delay
+    if (processedFiles.value.length > 0) {
+        setTimeout(() => {
+            const downloadsSection = document.querySelector('.processed-downloads');
+            if (downloadsSection) {
+                downloadsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
+    }
 };
 
 const downloadFile = (file) => {
