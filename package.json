@@ -25,6 +25,8 @@
         "@ffmpeg/ffmpeg": "^0.12.15",
         "@ffmpeg/util": "^0.12.2",
         "@inertiajs/vue3": "^2.2.17",
+        "@sentry/browser": "^10.39.0",
+        "@sentry/vue": "^10.39.0",
         "@vitejs/plugin-vue": "^6.0.1",
         "autoprefixer": "^10.4.22",
         "file-saver": "^2.0.5",

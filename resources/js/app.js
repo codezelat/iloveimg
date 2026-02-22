@@ -8,14 +8,41 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 
 const appName = import.meta.env.VITE_APP_NAME || 'ILoveIMG';
 
+// Initialize Sentry only if DSN is configured
+const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+
+if (sentryDsn) {
+    import('@sentry/vue').then((Sentry) => {
+        Sentry.init({
+            dsn: sentryDsn,
+            environment: import.meta.env.VITE_SENTRY_ENVIRONMENT || 'production',
+            integrations: [
+                Sentry.browserTracingIntegration(),
+            ],
+            tracesSampleRate: 0.1,
+            beforeSend(event) {
+                if (import.meta.env.DEV && !import.meta.env.VITE_SENTRY_DEBUG) {
+                    console.log('[Sentry] Would send error:', event);
+                    return null;
+                }
+                return event;
+            },
+        });
+        console.log('[Sentry] Initialized');
+    });
+}
+
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
-        return createApp({ render: () => h(App, props) })
-            .use(plugin)
+        const app = createApp({ render: () => h(App, props) });
+        
+        app.use(plugin)
             .use(ZiggyVue)
             .mount(el);
+        
+        return app;
     },
     progress: {
         color: '#ef4444',

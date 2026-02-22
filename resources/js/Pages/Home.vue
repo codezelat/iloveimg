@@ -20,7 +20,7 @@
                             All-in-one image studio for instant, private workflows.
                         </h1>
                         <p class="text-lg text-white/70 max-w-2xl">
-                            26+ pro-grade tools for conversion, compression, resizing, and editing — all powered by the Canvas API directly in your browser (now including HEIC and HEIF support).
+                            28+ pro-grade tools for conversion, compression, resizing, and editing — all powered by the Canvas API directly in your browser (now including HEIC and HEIF support).
                         </p>
                         <div class="flex flex-wrap gap-4">
                             <Link :href="route('tools.image-workbench')" class="btn-primary">
@@ -36,7 +36,7 @@
                                 <p>Uploads to server</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-semibold text-white">26</p>
+                                <p class="text-2xl font-semibold text-white">28</p>
                                 <p>Specialized utilities</p>
                             </div>
                             <div>

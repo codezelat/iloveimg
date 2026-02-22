@@ -126,6 +126,26 @@
                 </div>
             </section>
 
+            <!-- Security Measures -->
+            <section class="space-y-4">
+                <h2 class="text-2xl font-semibold text-white">Security Measures</h2>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+                    <p class="text-white/80 mb-4">
+                        We implement standard security headers to protect against common web vulnerabilities:
+                    </p>
+                    <ul class="space-y-2 text-white/70">
+                        <li>• <strong>X-Frame-Options</strong> — Prevents clickjacking by disallowing iframe embedding</li>
+                        <li>• <strong>X-Content-Type-Options</strong> — Prevents MIME type sniffing attacks</li>
+                        <li>• <strong>X-XSS-Protection</strong> — Legacy cross-site scripting protection</li>
+                        <li>• <strong>Referrer-Policy</strong> — Limits information leakage when navigating to external sites</li>
+                        <li>• <strong>Content Security Policy (optional)</strong> — Controls what resources can load (disabled by default)</li>
+                    </ul>
+                    <p class="text-white/60 text-sm mt-4">
+                        These headers are security best practices and contain no tracking or identifying information.
+                    </p>
+                </div>
+            </section>
+
             <!-- Cookies -->
             <section class="space-y-4">
                 <h2 class="text-2xl font-semibold text-white">Cookies & Storage</h2>
@@ -136,6 +156,26 @@
                         <li>• <strong>Optional local storage</strong> — if we add preferences in the future, they'll be opt-in only</li>
                         <li>• <strong>Session-only processing</strong> — converted files exist only in memory until you download them</li>
                     </ul>
+                </div>
+            </section>
+
+            <!-- Error Monitoring -->
+            <section class="space-y-4">
+                <h2 class="text-2xl font-semibold text-white">Error Monitoring (Optional)</h2>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+                    <p class="text-white/80 mb-4">
+                        We may use <a href="https://sentry.io" target="_blank" class="text-primary-400 hover:text-primary-300">Sentry</a> 
+                        for error tracking to help us fix bugs. This is only enabled if configured:
+                    </p>
+                    <ul class="space-y-2 text-white/70">
+                        <li>• Sentry receives JavaScript error messages and stack traces</li>
+                        <li>• No image data, filenames, or file contents are ever sent</li>
+                        <li>• No user identification or tracking</li>
+                        <li>• Errors include browser type and page URL only</li>
+                    </ul>
+                    <p class="text-white/60 text-sm mt-4">
+                        If Sentry is not configured (default), no error data leaves your browser.
+                    </p>
                 </div>
             </section>
 

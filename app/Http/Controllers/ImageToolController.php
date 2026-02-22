@@ -213,6 +213,22 @@ public function rotateImage()
         ]);
     }
 
+    public function svgToPng()
+    {
+        return Inertia::render('Tools/Conversion/SvgToPng', [
+            'toolName' => 'SVG to PNG',
+            'description' => 'Convert SVG vector graphics to PNG raster images in your browser'
+        ]);
+    }
+
+    public function icoGenerator()
+    {
+        return Inertia::render('Tools/Utility/IcoGenerator', [
+            'toolName' => 'Favicon Generator',
+            'description' => 'Generate favicon.ico files from your images for websites'
+        ]);
+    }
+
     public function privacy()
     {
         return Inertia::render('PrivacyPolicy');
@@ -252,6 +268,7 @@ public function rotateImage()
                     ['name' => 'TIFF to PNG', 'path' => 'tiff-to-png'],
                     ['name' => 'HEIC to JPG', 'path' => 'heic-to-jpg'],
                     ['name' => 'HEIC to PNG', 'path' => 'heic-to-png'],
+                    ['name' => 'SVG to PNG', 'path' => 'svg-to-png'],
                 ]
             ],
             [
@@ -286,6 +303,7 @@ public function rotateImage()
                 'tools' => [
                     ['name' => 'Image to Base64', 'path' => 'image-to-base64'],
                     ['name' => 'Base64 to Image', 'path' => 'base64-to-image'],
+                    ['name' => 'Favicon Generator', 'path' => 'ico-generator'],
                 ]
             ],
             [

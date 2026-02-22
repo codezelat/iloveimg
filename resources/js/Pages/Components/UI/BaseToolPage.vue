@@ -297,9 +297,39 @@ const statusLabel = computed(() => {
     return 'Ready when you are';
 });
 
+const getFileFingerprint = (file) => `${file.name}-${file.size}-${file.lastModified}`;
+
 const handleFilesSelected = (files) => {
-    selectedFiles.value = files;
-    errorMessage.value = '';
+    // Check for duplicates
+    const existingFingerprints = new Set(selectedFiles.value.map(getFileFingerprint));
+    const duplicates = [];
+    const newFiles = [];
+    
+    for (const file of files) {
+        const fingerprint = getFileFingerprint(file);
+        if (existingFingerprints.has(fingerprint)) {
+            duplicates.push(file.name);
+        } else {
+            newFiles.push(file);
+            existingFingerprints.add(fingerprint);
+        }
+    }
+    
+    // Show warning for duplicates
+    if (duplicates.length > 0) {
+        errorMessage.value = duplicates.length === 1 
+            ? `"${duplicates[0]}" is already in the queue`
+            : `${duplicates.length} files are already in the queue: ${duplicates.join(', ').substring(0, 50)}...`;
+        
+        // Auto-clear error after 3 seconds
+        setTimeout(() => {
+            if (errorMessage.value.includes('already in the queue')) {
+                errorMessage.value = '';
+            }
+        }, 3000);
+    }
+    
+    selectedFiles.value = [...selectedFiles.value, ...newFiles];
 };
 
 const removeFile = (index) => {

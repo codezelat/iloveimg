@@ -39,6 +39,9 @@ Route::get('/watermark-image', [ImageToolController::class, 'watermarkImage'])->
 // Utility Routes
 Route::get('/image-to-base64', [ImageToolController::class, 'imageToBase64'])->name('tools.image-to-base64');
 Route::get('/base64-to-image', [ImageToolController::class, 'base64ToImage'])->name('tools.base64-to-image');
+Route::get('/svg-to-png', [ImageToolController::class, 'svgToPng'])->name('tools.svg-to-png');
+Route::get('/ico-generator', [ImageToolController::class, 'icoGenerator'])->name('tools.ico-generator');
+Route::get('/favicon-generator', fn() => redirect('/ico-generator')); // Alias
 
 // Advanced Suite
 Route::get('/image-workbench', [ImageToolController::class, 'imageWorkbench'])->name('tools.image-workbench');
@@ -48,6 +51,10 @@ Route::get('/privacy', [ImageToolController::class, 'privacy'])->name('privacy')
 Route::get('/privacy-policy', fn() => redirect('/privacy'));
 Route::get('/terms', [ImageToolController::class, 'terms'])->name('terms');
 Route::get('/terms-of-service', fn() => redirect('/terms'));
+
+// Health Check Endpoint
+Route::get('/health', \App\Http\Controllers\HealthController::class)->name('health');
+Route::get('/up', fn() => response()->json(['status' => 'ok'])); // Simple uptime check
 
 // 404 Catch-All
 Route::fallback(fn() => Inertia\Inertia::render('NotFound'));

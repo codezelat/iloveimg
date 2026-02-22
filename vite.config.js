@@ -4,6 +4,8 @@ import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
+    // Expose env vars to frontend (must start with VITE_)
+    envPrefix: 'VITE_',
     plugins: [
         tailwindcss(),
         laravel({
