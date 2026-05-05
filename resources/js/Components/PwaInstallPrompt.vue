@@ -121,10 +121,15 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import {
+    getDeferredInstallPrompt,
+    isStandalone,
+    triggerInstallPrompt,
+} from '../pwa.js';
 
 const showPrompt = ref(false);
 const installing = ref(false);
-let installPromptEvent = null;
+const installPromptAvailable = ref(false);
 
 // Check if already dismissed or installed
 const hasUserDismissed = () => {
@@ -135,14 +140,6 @@ const setDismissed = () => {
     localStorage.setItem('pwa-prompt-dismissed', 'true');
 };
 
-const isStandalone = () => {
-    return (
-        window.matchMedia('(display-mode: standalone)').matches ||
-        window.navigator.standalone === true ||
-        document.referrer.includes('android-app://')
-    );
-};
-
 // Show prompt with delay
 const schedulePrompt = () => {
     // Don't show if already installed or dismissed
@@ -151,13 +148,13 @@ const schedulePrompt = () => {
     }
     
     // Don't show if no install prompt available
-    if (!installPromptEvent) {
+    if (!installPromptAvailable.value) {
         return;
     }
     
     // Show after 3 seconds of page load
     setTimeout(() => {
-        if (!hasUserDismissed() && installPromptEvent) {
+        if (!hasUserDismissed() && installPromptAvailable.value) {
             showPrompt.value = true;
         }
     }, 3000);
@@ -169,16 +166,21 @@ const handleBeforeInstallPrompt = (event) => {
     event.preventDefault();
     
     // Store the event for later use
-    installPromptEvent = event;
+    installPromptAvailable.value = true;
     
     // Schedule the prompt
+    schedulePrompt();
+};
+
+const handleInstallable = () => {
+    installPromptAvailable.value = Boolean(getDeferredInstallPrompt());
     schedulePrompt();
 };
 
 // Handle appinstalled event
 const handleAppInstalled = () => {
     showPrompt.value = false;
-    installPromptEvent = null;
+    installPromptAvailable.value = false;
     
     // Show success message
     console.log('[PWA] App was installed');
@@ -187,17 +189,21 @@ const handleAppInstalled = () => {
 onMounted(() => {
     // Listen for install prompt
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('pwa:installable', handleInstallable);
+    window.addEventListener('pwa:installed', handleAppInstalled);
     window.addEventListener('appinstalled', handleAppInstalled);
     
     // Also check if prompt is already available
-    if (window.deferredInstallPrompt) {
-        installPromptEvent = window.deferredInstallPrompt;
+    if (getDeferredInstallPrompt()) {
+        installPromptAvailable.value = true;
         schedulePrompt();
     }
 });
 
 onUnmounted(() => {
     window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.removeEventListener('pwa:installable', handleInstallable);
+    window.removeEventListener('pwa:installed', handleAppInstalled);
     window.removeEventListener('appinstalled', handleAppInstalled);
 });
 
@@ -207,28 +213,18 @@ const dismiss = () => {
 };
 
 const install = async () => {
-    if (!installPromptEvent) {
-        return;
-    }
-    
     installing.value = true;
-    
-    // Show the install prompt
-    installPromptEvent.prompt();
-    
-    // Wait for the user to respond
-    const { outcome } = await installPromptEvent.userChoice;
-    
-    if (outcome === 'accepted') {
-        console.log('[PWA] User accepted the install prompt');
-    } else {
-        console.log('[PWA] User dismissed the install prompt');
-        setDismissed();
+
+    try {
+        const installed = await triggerInstallPrompt();
+
+        if (!installed) {
+            setDismissed();
+        }
+    } finally {
+        installPromptAvailable.value = false;
+        installing.value = false;
+        showPrompt.value = false;
     }
-    
-    // Clear the deferred prompt
-    installPromptEvent = null;
-    installing.value = false;
-    showPrompt.value = false;
 };
 </script>

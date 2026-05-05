@@ -12,9 +12,12 @@ const PAGES_CACHE_NAME = `${CACHE_NAME}-pages`;
 const STATIC_ASSETS = [
     '/',
     '/offline.html',
+    '/manifest.webmanifest',
     '/icon.svg',
     '/ilvimg.png',
-    '/favicon.ico'
+    '/favicon.ico',
+    '/icons/icon-192x192.png',
+    '/icons/icon-512x512.png'
 ];
 
 // Skip waiting and claim clients immediately

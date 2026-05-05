@@ -21,6 +21,7 @@
         <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
         <meta name="msapplication-TileColor" content="#0f172a">
         <meta name="msapplication-config" content="/browserconfig.xml">
+        <link rel="manifest" href="/manifest.webmanifest">
         
         <!-- Base SEO (will be overridden by Inertia SeoHead component) -->
         <title inertia>{{ config('app.name', 'ILoveIMG Studio') }}</title>

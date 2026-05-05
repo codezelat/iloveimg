@@ -6,6 +6,9 @@
 // Track install prompt event
 let deferredInstallPrompt = null;
 
+export const INSTALL_FALLBACK_MESSAGE = 'To install:\n\n1. Click the ... menu in Edge\n2. Go to Apps -> Install this site as an app';
+export const ALREADY_INSTALLED_MESSAGE = 'ILoveIMG Studio is already installed.';
+
 /**
  * Register the service worker
  */
@@ -113,35 +116,63 @@ export function initInstallPrompt() {
     // Listen for app installed event
     window.addEventListener('appinstalled', () => {
         console.log('[PWA] App was installed');
-        deferredInstallPrompt = null;
+        clearInstallPrompt();
         
         // Dispatch custom event
         window.dispatchEvent(new CustomEvent('pwa:installed'));
     });
 }
 
+export function getDeferredInstallPrompt() {
+    return deferredInstallPrompt || window.deferredInstallPrompt || null;
+}
+
+export function clearInstallPrompt() {
+    deferredInstallPrompt = null;
+    window.deferredInstallPrompt = null;
+}
+
+export function showInstallFallback() {
+    alert(INSTALL_FALLBACK_MESSAGE);
+}
+
 /**
  * Trigger the install prompt
  * @returns {Promise<boolean>} Whether the app was installed
  */
-export async function triggerInstallPrompt() {
-    if (!deferredInstallPrompt) {
+export async function triggerInstallPrompt({ showFallback = true, showAlreadyInstalled = true } = {}) {
+    if (isStandalone()) {
+        if (showAlreadyInstalled) {
+            alert(ALREADY_INSTALLED_MESSAGE);
+        }
+
+        return true;
+    }
+
+    const promptEvent = getDeferredInstallPrompt();
+
+    if (!promptEvent) {
         console.log('[PWA] Install prompt not available');
+        if (showFallback) {
+            showInstallFallback();
+        }
+
         return false;
     }
 
-    // Show the install prompt
-    deferredInstallPrompt.prompt();
+    try {
+        // Show the install prompt
+        await promptEvent.prompt();
 
-    // Wait for the user to respond
-    const { outcome } = await deferredInstallPrompt.userChoice;
-    
-    console.log(`[PWA] User ${outcome === 'accepted' ? 'installed' : 'dismissed'} the app`);
-    
-    // Clear the deferred prompt
-    deferredInstallPrompt = null;
+        // Wait for the user to respond
+        const { outcome } = await promptEvent.userChoice;
 
-    return outcome === 'accepted';
+        console.log(`[PWA] User ${outcome === 'accepted' ? 'installed' : 'dismissed'} the app`);
+
+        return outcome === 'accepted';
+    } finally {
+        clearInstallPrompt();
+    }
 }
 
 /**
@@ -149,7 +180,7 @@ export async function triggerInstallPrompt() {
  * @returns {boolean}
  */
 export function isInstallable() {
-    return deferredInstallPrompt !== null;
+    return getDeferredInstallPrompt() !== null;
 }
 
 /**
@@ -288,6 +319,9 @@ export default {
     triggerInstallPrompt,
     isInstallable,
     isStandalone,
+    getDeferredInstallPrompt,
+    clearInstallPrompt,
+    showInstallFallback,
     getDisplayMode,
     subscribeToPushNotifications,
     unsubscribeFromPushNotifications
